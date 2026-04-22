@@ -49,9 +49,9 @@ window.onload = function () {
     }
 };
 
-function closeToast() {
-    document.getElementById("toast").style.display = "none";
-}
+// function closeToast() {
+//     document.getElementsByClassName("toast-message").style.display = "none";
+// }
 
 document.addEventListener('DOMContentLoaded', function () {
     flatpickr(".datepicker", {
