@@ -23,6 +23,8 @@ class Supplier extends Model
         'payment_terms',
         'supplier_notes',
         'supplier_representative',
+        'payment_term_id',
+        'payment_term_days',
         'supplier_rank',
         'created_by',
         'updated_by',
@@ -52,5 +54,10 @@ class Supplier extends Model
             '3' => 'Satisfactory',
             default => '-',
         };
+    }
+
+    public function paymentTerm(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(PaymentTerm::class);
     }
 }

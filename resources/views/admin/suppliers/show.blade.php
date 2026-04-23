@@ -18,9 +18,9 @@
                 </nav>
             </div>
             <div class="d-flex gap-2">
-                <a href="{{ route('suppliers.edit', $supplier->id) }}" class="btn btn-success btn-sm">
+                {{-- <a href="{{ route('suppliers.edit', $supplier->id) }}" class="btn btn-success btn-sm">
                     <i class="fa fa-edit me-1"></i> Edit
-                </a>
+                </a> --}}
                 <a href="{{ route('suppliers.index') }}" class="btn btn-success btn-sm">
                     <i class="fa fa-arrow-left me-1"></i> Back
                 </a>
@@ -120,8 +120,14 @@
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-semibold small text-uppercase">Payment Term</label>
+                    {{-- FIX: use the eager-loaded relationship instead of non-existent payment_terms attribute --}}
                     <input type="text" class="form-control form-control-sm show-readonly"
-                        value="{{ $supplier->payment_terms ?? '-' }}" readonly>
+                        value="{{ $supplier->paymentTerm->name ?? '-' }}" readonly>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold small text-uppercase">Payment Days</label>
+                    <input type="text" class="form-control form-control-sm show-readonly"
+                        value="{{ $supplier->payment_term_days ? $supplier->payment_term_days . ' days' : '-' }}" readonly>
                 </div>
             </div>
 

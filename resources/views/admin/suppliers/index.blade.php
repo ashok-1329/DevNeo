@@ -20,10 +20,11 @@
                 </div>
                 <div class="col-auto">
                     <label class="form-label fw-semibold small mb-1 text-light">PAYMENT TERM</label>
+                    {{-- FIX: value must be the term name (string) so DataTable column search matches --}}
                     <select id="filterPaymentTerm" class="form-select form-select-sm" style="min-width:180px">
                         <option value="">Select Payment Term</option>
                         @foreach ($paymentTerms as $pt)
-                            <option value="{{ $pt }}">{{ $pt }}</option>
+                            <option value="{{ $pt->name }}">{{ $pt->name }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -44,19 +45,6 @@
                 </div>
             </div>
         </div>
-
-        {{-- @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
-        @if (session('error'))
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif --}}
 
         <div class="card p-3">
             <div class="table-responsive">
@@ -191,7 +179,6 @@
 <script>
     const suppliersDataUrl = "{{ route('suppliers.data') }}";
     const supplierBaseUrl = "{{ url('suppliers') }}";
-    const supplierRankUrl = "{{ url('suppliers') }}";
     const csrfToken = "{{ csrf_token() }}";
 </script>
 

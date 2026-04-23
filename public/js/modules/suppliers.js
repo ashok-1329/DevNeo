@@ -1,13 +1,13 @@
+// ─── Supplier Listing (DataTable) ────────────────────────────────────────────
+
 $(document).ready(function () {
   if (!$("#suppliersTable").length) return;
 
-  const rankLabel = {
-    1: "Do Not Use",
-    2: "Use With Caution",
-    3: "Satisfactory",
-  };
   const rankClass = { 1: "rank-1", 2: "rank-2", 3: "rank-3" };
 
+  // Column order must match index.blade.php <thead> exactly (11 columns):
+  // CATEGORY | BUSINESS NAME | EMAIL | PHONE | ABN | ACCOUNT EMAIL ADDRESS |
+  // PAYMENT TERM | ADDRESS | NOTES | SUPPLIER RANK | ACTION
   const table = $("#suppliersTable").DataTable({
     processing: true,
     ajax: { url: suppliersDataUrl, dataSrc: "" },
@@ -18,25 +18,37 @@ $(document).ready(function () {
         data: "category",
         render: (d) => (d ? d.name : "-"),
       },
-      { data: "supplier_name" },
-      {
-        data: "supplier_email",
-        render: (d) => `${d}`,
-      },
-      { data: "supplier_phone" },
+      { data: "supplier_name", defaultContent: "-" },
+      { data: "supplier_email", defaultContent: "-" },
+      { data: "supplier_phone", defaultContent: "-" },
       { data: "supplier_abn", defaultContent: "-" },
       { data: "supplier_bank_email", defaultContent: "-" },
-      { data: "payment_terms", defaultContent: "-" },
+      {
+        // Shows "30 Days (30d)" or just the name when days is null
+        data: null,
+        render: (d) => {
+          // Support both camelCase (paymentTerm) and snake_case (payment_term) relationship keys
+          const term = d.paymentTerm || d.payment_term || null;
+          if (!term) return "-";
+          return d.payment_term_days != null
+            ? `${term.name} <span class="text-muted small">(${d.payment_term_days}d)</span>`
+            : term.name;
+        },
+      },
       {
         data: "supplier_address",
         render: (d) => `<span class="notes-cell">${d || "-"}</span>`,
       },
       {
         data: "supplier_notes",
-        render: (d) => `<span class="notes-cell">${d || "-"}</span>`,
+        render: (d) => {
+          if (!d) return '<span class="notes-cell">-</span>';
+          // Strip HTML tags for table display
+          const stripped = d.replace(/<[^>]*>/g, "").trim();
+          return `<span class="notes-cell">${stripped || "-"}</span>`;
+        },
       },
       {
-        // Inline rank select
         data: null,
         orderable: false,
         render: function (data) {
@@ -54,35 +66,33 @@ $(document).ready(function () {
       {
         data: "id",
         orderable: false,
-        render: function (id) {
-          return `
-                        <a href="${supplierBaseUrl}/${id}/edit" class="py-2 action-btn btn btn-sm btn-success" title="Edit">
-                            <i class="fa fa-edit"></i>
-                        </a>
-                        <a href="${supplierBaseUrl}/${id}" class="py-2 action-btn btn btn-sm btn-secondary ms-1" title="View">
-                            <i class="fa fa-eye"></i>
-                        </a>
-                        <button class="action-btn btn btn-sm btn-danger ms-1 btn-delete py-2" data-id="${id}" title="Delete">
-                            <i class="fa fa-trash"></i>
-                        </button>
-                    `;
-        },
+        render: (id) => `
+          <a href="${supplierBaseUrl}/${id}/edit" class="py-2 action-btn btn btn-sm btn-success" title="Edit">
+            <i class="fa fa-edit"></i>
+          </a>
+          <a href="${supplierBaseUrl}/${id}" class="py-2 action-btn btn btn-sm btn-secondary ms-1" title="View">
+            <i class="fa fa-eye"></i>
+          </a>
+          <button class="action-btn btn btn-sm btn-danger ms-1 btn-delete py-2" data-id="${id}" title="Delete">
+            <i class="fa fa-trash"></i>
+          </button>
+        `,
       },
     ],
   });
 
-
+  // Filter by category name (col 0)
   $("#filterCategory").on("change", function () {
     table.column(0).search(this.value).draw();
   });
 
+  // Filter by payment term name (col 6)
   $("#filterPaymentTerm").on("change", function () {
     table.column(6).search(this.value).draw();
   });
 
   $("#btnClearFilter").on("click", function () {
-    $("#filterCategory").val("");
-    $("#filterPaymentTerm").val("");
+    $("#filterCategory, #filterPaymentTerm").val("");
     table.search("").columns().search("").draw();
   });
 
@@ -96,11 +106,11 @@ $(document).ready(function () {
       "ABN",
       "Account Email",
       "Payment Term",
+      "Payment Days",
       "Address",
       "Notes",
       "Rank",
     ];
-
     const rankText = {
       1: "Do Not Use",
       2: "Use With Caution",
@@ -109,20 +119,24 @@ $(document).ready(function () {
 
     const csv = [
       header.join(","),
-      ...rows.map((r) =>
-        [
+      ...rows.map((r) => {
+        const term = r.paymentTerm || r.payment_term || null;
+        return [
           csvEscape(r.category ? r.category.name : ""),
           csvEscape(r.supplier_name),
           csvEscape(r.supplier_email),
           csvEscape(r.supplier_phone),
           csvEscape(r.supplier_abn),
           csvEscape(r.supplier_bank_email),
-          csvEscape(r.payment_terms),
+          csvEscape(term ? term.name : ""),
+          csvEscape(r.payment_term_days != null ? r.payment_term_days : ""),
           csvEscape(r.supplier_address),
-          csvEscape(r.supplier_notes),
+          csvEscape(
+            r.supplier_notes ? r.supplier_notes.replace(/<[^>]*>/g, "") : "",
+          ),
           csvEscape(rankText[r.supplier_rank] || ""),
-        ].join(","),
-      ),
+        ].join(",");
+      }),
     ].join("\n");
 
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
@@ -145,7 +159,6 @@ $(document).ready(function () {
     const id = select.data("id");
     const val = select.val();
 
-    // Update visual class
     select.removeClass("rank-1 rank-2 rank-3 rank-null");
     select.addClass(val ? rankClass[val] : "rank-null");
 
@@ -153,12 +166,8 @@ $(document).ready(function () {
       url: `${supplierBaseUrl}/${id}/rank`,
       type: "PATCH",
       data: { supplier_rank: val, _token: csrfToken },
-      success: function (res) {
-        showToast("Rank updated successfully.", "success");
-      },
-      error: function () {
-        showToast("Failed to update rank.", "danger");
-      },
+      success: () => showToast("Rank updated successfully.", "success"),
+      error: () => showToast("Failed to update rank.", "danger"),
     });
   });
 
@@ -174,26 +183,25 @@ $(document).ready(function () {
         table.ajax.reload(null, false);
         showToast("Supplier deleted.", "success");
       },
-      error: function (xhr) {
-        console.log(xhr.responseText); // helpful debug
-        showToast("Failed to delete supplier.", "danger");
-      },
+      error: () => showToast("Failed to delete supplier.", "danger"),
     });
   });
-
-  function showToast(msg, type = "success") {
-    const id = "toast_" + Date.now();
-    const html = `
-            <div id="${id}" class="toast align-items-center text-white bg-${type} border-0 position-fixed bottom-0 end-0 m-3"
-                 role="alert" style="z-index:9999">
-                <div class="d-flex">
-                    <div class="toast-body">${msg}</div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-                </div>
-            </div>`;
-    $("body").append(html);
-    const el = document.getElementById(id);
-    new bootstrap.Toast(el, { delay: 3000 }).show();
-    el.addEventListener("hidden.bs.toast", () => el.remove());
-  }
 });
+
+// ─── Shared Toast ─────────────────────────────────────────────────────────────
+
+function showToast(msg, type = "success") {
+  const id = "toast_" + Date.now();
+  const html = `
+    <div id="${id}" class="toast align-items-center text-white bg-${type} border-0 position-fixed bottom-0 end-0 m-3"
+         role="alert" style="z-index:9999">
+      <div class="d-flex">
+        <div class="toast-body">${msg}</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+      </div>
+    </div>`;
+  $("body").append(html);
+  const el = document.getElementById(id);
+  new bootstrap.Toast(el, { delay: 3000 }).show();
+  el.addEventListener("hidden.bs.toast", () => el.remove());
+}

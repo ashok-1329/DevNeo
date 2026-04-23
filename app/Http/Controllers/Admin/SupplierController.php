@@ -3,141 +3,145 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\PaymentTerm;
 use App\Models\Supplier;
 use App\Models\SupplierCategory;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\SuppliersImport;
+use Maatwebsite\Excel\Concerns\ToArray;
 
 class SupplierController extends Controller
 {
-    private const PAYMENT_TERMS = [
-        '8 EOM',
-        '14 Days',
-        '28 Days',
-        '30 Days',
-        '7 Days',
-        '30 Days EOM',
-        '10 Days',
-        'Other',
-    ];
+    private function validationRules(): array
+    {
+        return [
+            'supplier_category'       => 'required|integer|exists:supplier_categories,id',
+            'supplier_name'           => 'required|string|max:255',
+            'supplier_email'          => 'required|email|max:255',
+            'supplier_phone'          => ['required', 'string', 'max:20', 'regex:/^[0-9+\-().\s]+$/'],
+            'supplier_abn'            => ['required', 'string', 'regex:/^\d{11}$/'],
+            'supplier_address'        => 'required|string|max:500',
+            'supplier_bank_email'     => 'required|email|max:255',
+            'supplier_bank_name'      => 'required|string|max:255',
+            'supplier_bsb_no'         => ['required', 'string', 'regex:/^\d{3}-?\d{3}$/'],
+            'supplier_account_number' => 'required|string|max:50',
+            'supplier_account_name'   => 'required|string|max:255',
+            'payment_term_id'         => 'required|integer|exists:payment_terms,id',
+            'supplier_notes'          => 'nullable|string',
+        ];
+    }
+
+    private function validationMessages(): array
+    {
+        return [
+            'supplier_category.required'       => 'Please select a category.',
+            'supplier_category.exists'         => 'Selected category is invalid.',
+            'supplier_name.required'           => 'Business name is required.',
+            'supplier_name.max'                => 'Business name must not exceed 255 characters.',
+            'supplier_email.required'          => 'Email is required.',
+            'supplier_email.email'             => 'Enter a valid email address.',
+            'supplier_phone.required'          => 'Phone number is required.',
+            'supplier_phone.regex'             => 'Phone number contains invalid characters.',
+            'supplier_abn.required'            => 'ABN is required.',
+            'supplier_abn.regex'               => 'ABN must be exactly 11 digits.',
+            'supplier_address.required'        => 'Address is required.',
+            'supplier_address.max'             => 'Address must not exceed 500 characters.',
+            'supplier_bank_email.required'     => 'Account email address is required.',
+            'supplier_bank_email.email'        => 'Enter a valid account email address.',
+            'supplier_bank_name.required'      => 'Bank name is required.',
+            'supplier_bsb_no.required'         => 'BSB number is required.',
+            'supplier_bsb_no.regex'            => 'BSB must be in format 000-000.',
+            'supplier_account_number.required' => 'Account number is required.',
+            'supplier_account_name.required'   => 'Account name is required.',
+            'payment_term_id.required'         => 'Please select a payment term.',
+            'payment_term_id.exists'           => 'Selected payment term is invalid.',
+        ];
+    }
 
     public function index()
     {
         $categories   = SupplierCategory::where('status', 1)->get();
-        $paymentTerms = self::PAYMENT_TERMS;
+        $paymentTerms = PaymentTerm::active(); // FIX: added ->get()
         return view('admin.suppliers.index', compact('categories', 'paymentTerms'));
     }
 
     public function getData()
     {
-        $suppliers = Supplier::with('category')->get();
-        return response()->json($suppliers);
+        return response()->json(
+            Supplier::with(['category', 'paymentTerm'])->get()
+        );
     }
 
     public function create()
     {
         $categories   = SupplierCategory::where('status', 1)->get();
-        $paymentTerms = self::PAYMENT_TERMS;
+        $paymentTerms = PaymentTerm::active(); // FIX: added ->get()
         return view('admin.suppliers.create', compact('categories', 'paymentTerms'));
     }
 
     public function store(Request $request)
     {
+        $validated = $request->validate(
+            $this->validationRules(),
+            $this->validationMessages()
+        );
 
-        $validated = $request->validate([
-            'supplier_name'           => 'required|string|max:255',
-            'supplier_email'          => 'required|email|max:255',
-            'supplier_phone'          => ['required', 'string', 'max:20', 'regex:/^[0-9\+\-\(\)\s\.]+$/'],
-            'supplier_address'        => 'required|string|max:500',
-            'supplier_category'       => 'required|integer|exists:supplier_categories,id',
-            'supplier_abn'            => ['required', 'string', 'max:20', 'regex:/^\d{11}$/'],
-            'supplier_bank_name'      => 'required|string|max:255',
-            'supplier_bsb_no'         => ['required', 'string', 'max:10', 'regex:/^\d{3}-?\d{3}$/'],
-            'supplier_account_number' => 'required|string|max:50',
-            'supplier_account_name'   => 'required|string|max:255',
-            'supplier_bank_email'     => 'required|email|max:255',
-            'payment_terms'           => 'required|string|in:' . implode(',', self::PAYMENT_TERMS),
-            'supplier_notes'          => 'nullable|string',
-        ]);
+        $id = (int) $request->payment_term_id;
 
-        Supplier::create([
-            'supplier_category'       => $validated['supplier_category'],
-            'supplier_name'           => $validated['supplier_name'],
-            'supplier_email'          => $validated['supplier_email'],
-            'supplier_phone'          => $validated['supplier_phone'],
-            'supplier_address'        => $validated['supplier_address'],
-            'supplier_abn'            => $validated['supplier_abn'],
-            'supplier_bank_name'      => $validated['supplier_bank_name'],
-            'supplier_bsb_no'         => $validated['supplier_bsb_no'],
-            'supplier_account_number' => $validated['supplier_account_number'],
-            'supplier_account_name'   => $validated['supplier_account_name'],
-            'supplier_bank_email'     => $validated['supplier_bank_email'],
-            'payment_terms'           => $validated['payment_terms'],
-            'supplier_notes'          => $validated['supplier_notes'] ?? null,
-            'supplier_rank'           => null,
-            'status'                  => 1,
-            'created_by'              => auth()->id(),
-        ]);
+        $term = PaymentTerm::findOrFail($id);
+        
+        Supplier::create(array_merge($validated, [
+            'payment_term_days' => $term->days,
+            'supplier_rank'     => null,
+            'status'            => 1,
+            'created_by'        => auth()->id(),
+        ]));
 
         return redirect()->route('suppliers.index')->with('success', 'Supplier created successfully.');
     }
 
     public function show($id)
     {
-        $supplier     = Supplier::with('category')->findOrFail($id);
+        $supplier     = Supplier::with(['category', 'paymentTerm'])->findOrFail($id);
         $categories   = SupplierCategory::where('status', 1)->get();
-        $paymentTerms = self::PAYMENT_TERMS;
+        $paymentTerms = PaymentTerm::active();
         return view('admin.suppliers.show', compact('supplier', 'categories', 'paymentTerms'));
     }
 
     public function edit($id)
     {
-        $supplier     = Supplier::findOrFail($id);
+        $supplier     = Supplier::with(['paymentTerm'])->findOrFail($id); // FIX: eager load paymentTerm for days
         $categories   = SupplierCategory::where('status', 1)->get();
-        $paymentTerms = self::PAYMENT_TERMS;
+        $paymentTerms = PaymentTerm::active(); // FIX: added ->get()
         return view('admin.suppliers.edit', compact('supplier', 'categories', 'paymentTerms'));
     }
 
     public function update(Request $request, $id)
     {
-        $validated = $request->validate([
-            'supplier_name'           => 'required|string|max:255',
-            'supplier_email'          => 'required|email|max:255',
-            'supplier_phone'          => ['required', 'string', 'max:20', 'regex:/^[0-9\+\-\(\)\s\.]+$/'],
-            'supplier_address'        => 'required|string|max:500',
-            'supplier_category'       => 'required|integer|exists:supplier_categories,id',
-            'supplier_abn'            => ['required', 'string', 'max:20', 'regex:/^\d{11}$/'],
-            'supplier_bank_name'      => 'required|string|max:255',
-            'supplier_bsb_no'         => ['required', 'string', 'max:10', 'regex:/^\d{3}-?\d{3}$/'],
-            'supplier_account_number' => 'required|string|max:50',
-            'supplier_account_name'   => 'required|string|max:255',
-            'supplier_bank_email'     => 'required|email|max:255',
-            'payment_terms'           => 'required|string|in:' . implode(',', self::PAYMENT_TERMS),
-            'supplier_notes'          => 'nullable|string',
-            'supplier_representative' => 'nullable|string|max:255',
-            'supplier_branch'         => 'nullable|string|max:255',
-            'payment_term'            => 'nullable|integer|min:0',
-            'status'                  => 'required|in:0,1',
+        $rules    = array_merge($this->validationRules(), ['status' => 'required|in:0,1']);
+        $messages = array_merge($this->validationMessages(), [
+            'status.required' => 'Status is required.',
+            'status.in'       => 'Status must be active or inactive.',
         ]);
 
-        $supplier = Supplier::findOrFail($id);
-        $supplier->update(array_merge($validated, ['updated_by' => auth()->id()]));
+        $validated = $request->validate($rules, $messages);
+
+        $term = PaymentTerm::findOrFail($validated['payment_term_id']);
+
+        Supplier::findOrFail($id)->update(array_merge($validated, [
+            'payment_term_days' => $term->days, // FIX: always sync days on update
+            'updated_by'        => auth()->id(),
+        ]));
 
         return redirect()->route('suppliers.index')->with('success', 'Supplier updated successfully.');
     }
 
-    /**
-     * Inline rank update from listing (AJAX).
-     */
     public function updateRank(Request $request, $id)
     {
-        $request->validate([
-            'supplier_rank' => 'nullable|in:1,2,3',
-        ]);
+        $request->validate(['supplier_rank' => 'nullable|in:1,2,3']);
 
-        $supplier = Supplier::findOrFail($id);
-        $supplier->update([
+        Supplier::findOrFail($id)->update([
             'supplier_rank' => $request->input('supplier_rank') ?: null,
             'updated_by'    => auth()->id(),
         ]);
@@ -148,16 +152,9 @@ class SupplierController extends Controller
     public function destroy($id)
     {
         Supplier::findOrFail($id)->delete();
-
-        return response()->json([
-            'message' => 'Supplier deleted.'
-        ]);
+        return response()->json(['message' => 'Supplier deleted.']);
     }
 
-    /**
-     * Import suppliers from Excel/CSV.
-     * Requires: composer require maatwebsite/excel
-     */
     public function import(Request $request)
     {
         $request->validate([
