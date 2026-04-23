@@ -16,42 +16,42 @@ class SeedData extends Seeder
     public function run(): void
     {
 
-        // $categories = [
-        //     'Neo',
-        //     'KOYA',
-        //     'CAT Rental',
-        //     'AGI Hire',
-        //     'Conplant',
-        //     'ACT Hire',
-        //     'Brooks Hire',
-        //     'V Rent',
-        //     'Kennards Hire',
-        //     'DARE Equipment',
-        //     'Loadex',
-        //     'MEH Hire and Equipment',
-        //     'Ozzie Water Carts',
-        //     'RAM Equipment',
-        //     'Coates Hire',
-        // ];
+        $categories = [
+            'Neo',
+            'KOYA',
+            'CAT Rental',
+            'AGI Hire',
+            'Conplant',
+            'ACT Hire',
+            'Brooks Hire',
+            'V Rent',
+            'Kennards Hire',
+            'DARE Equipment',
+            'Loadex',
+            'MEH Hire and Equipment',
+            'Ozzie Water Carts',
+            'RAM Equipment',
+            'Coates Hire',
+        ];
 
-        // foreach ($categories as $name) {
-        //     DB::table('supplier_categories')->insert([
-        //         'name'       => $name,
-        //         'status'     => 1,
-        //         'created_at' => now(),
-        //         'updated_at' => now(),
-        //     ]);
-        // }
+        foreach ($categories as $name) {
+            DB::table('supplier_categories')->insert([
+                'name'       => $name,
+                'status'     => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
 
-        // $nominatecategories = ['Materials', 'Subcontractor', 'Plant Hire', 'Labour Hire'];
+        $nominatecategories = ['Materials', 'Subcontractor', 'Plant Hire', 'Labour Hire'];
 
-        // foreach ($nominatecategories as $name) {
-        //     DB::table('supplier_nominate_categories')->insert([
-        //         'name'       => $name,
-        //         'status'     => 1,
-        //         'created_at' => now(),
-        //         'updated_at' => now(),
-        //     ]);
-        // }
+        foreach ($nominatecategories as $name) {
+            DB::table('supplier_nominate_categories')->insert([
+                'name'       => $name,
+                'status'     => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
     }
 }
