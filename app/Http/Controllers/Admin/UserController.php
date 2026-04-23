@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Services\UserService;
 use App\Models\Role;
 use App\Models\User;
+use App\Models\UserCertification;
 use App\Models\CertificationTitle;
 use Illuminate\Http\Request;
 use Pest\TestCaseMethodFilters\PrTestCaseFilter;
@@ -136,17 +137,32 @@ class UserController extends Controller
     // STEP 2 → CERTIFICATIONS
     if ($step == 2) {
 
-        $certifications = json_decode($request->certifications, true);
+        $certifications = $request->certifications;
+
         foreach ($certifications as $cert) {
-            UserCertification::create([
-                'user_id' => $request->user_id,
-                'title' => $cert['title'],
-                'expiry_date' => formatToDbDate($cert['expiry_date']),
-                'file' => $cert['file']
-            ]);
+
+          $newCert = UserCertification::create([
+            'user_id' => $request->user_id,
+            'title_id' => $cert['title_id'],
+            'expiry_date' => formatToDbDate($cert['expiry_date']),
+            'file' => $cert['file']
+        ]);
+
+            // GET TITLE NAME
+        $title = CertificationTitle::find($cert['title_id']);
+
+        $savedCerts[] = [
+            'id' => $newCert->id,
+            'title' => $title->name ?? '',
+            'expiry_date' => date('d/m/Y', strtotime($newCert->expiry_date)),
+            'file' => $newCert->file
+        ];
         }
 
-        return response()->json(['success' => true]);
+         return response()->json([
+            'success' => true,
+            'data' => $savedCerts
+        ]);
     }
 
     // STEP 3 → CONTRACT

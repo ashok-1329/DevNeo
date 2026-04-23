@@ -53,7 +53,17 @@
         <div id="step2" class="step d-none">
             <button class="btn btn-dark mb-3" id="addCertBtn">Add Certificate</button>
 
-            <ul id="certList"></ul>
+            <table class="table table-bordered" id="certTable">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Title</th>
+            <th>Expiry</th>
+            <th>Attachment</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
 
             <button class="btn btn-secondary" id="second_prev">Previous</button>
             <button class="btn btn-success" id="second_step">Next</button>

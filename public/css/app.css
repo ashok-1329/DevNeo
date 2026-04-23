@@ -16,9 +16,19 @@ body {
     border-color: var(--primary-color) !important;
 }
 
+.bg-success {
+    background-color: var(--primary-color) !important;
+}
+
+.bg-danger {
+    background-color: #ff0000 !important;
+}
+
 .bg-secondary {
     background-color: #616362 !important;
 }
+
+
 
 span.danger {
     color: #ff0000;
@@ -27,6 +37,55 @@ span.danger {
 .btn-success:hover {
     background-color: var(--primary-dark) !important;
     border-color: var(--primary-dark) !important;
+}
+
+
+.custom-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    color: #fff;
+    padding: 12px 18px;
+    border-radius: 5px;
+    z-index: 9999;
+    min-width: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.custom-toast .close-toast {
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.auth-wrapper {
+            min-height: 100vh;
+        }
+.auth-card {
+    width: 100%;
+    max-width: 420px;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.auth-header {
+    background-color: var(--primary-color);
+    color: #fff;
+    padding: 15px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 18px;
+}
+
+.auth-card .card-body {
+    padding: 25px;
+}
+
+@media (max-width: 576px) {
+    .auth-card {
+        margin: 10px;
+    }
 }
 
 .card-box {

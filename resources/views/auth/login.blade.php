@@ -1,7 +1,7 @@
 @extends('layouts.auth')
-@section('title', 'Lets Get Started')
+@section('title', 'Login')
+@section('heading', 'Lets Get Started')
 @section('content')
-
 <form method="POST" action="{{ route('login') }}">
     @csrf
 
@@ -34,7 +34,7 @@
     <div class="d-flex justify-content-between">
         <a href="{{ route('password.request') }}">Forgot Password?</a>
 
-        <button class="btn btn-success">Login</button>
+        <button class="btn btn-success">SIGN IN</button>
     </div>
 
 </form>

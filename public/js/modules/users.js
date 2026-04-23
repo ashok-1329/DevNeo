@@ -196,25 +196,86 @@ $(document).ready(function () {
     $("#certModal").modal("show");
   });
 
-  $(document).on("click", "#save_cart", function () {
+
+$(document).on('click', '#save_cart', function () {
     saveCert();
   });
 
-  function saveCert() {
-    let title = $("#certTitle").val();
-    let expiry = $("#certExpiry").val();
+function saveCert() {
 
-    certifications.push({
-      title: title,
-      expiry_date: expiry,
-      file: certFile || "",
+    let title = $('#certTitle option:selected').text();
+    let titleId = $('#certTitle').val();
+    let expiry = $('#certExpiry').val();
+
+    $.ajax({
+        url: userStepUrl,
+        method: "POST",
+        data: {
+            step: 2,
+            user_id: userId,
+            certifications: [
+                {
+                title_id: titleId,
+                expiry_date: expiry,
+                file: certFile || ''
+            }
+            ],
+
+            _token: $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function (res) {
+
+            if (res.success) {
+
+                res.data.forEach(function (cert) {
+
+                    let rowCount = $('#certTable tbody tr').length + 1;
+
+                    $('#certTable tbody').append(`
+                        <tr id="cert-${cert.id}">
+                            <td>${rowCount}</td>
+                            <td>${cert.title}</td>
+                            <td>${cert.expiry_date}</td>
+                            <td>
+                                <i class="fa fa-pen me-2 text-primary" onclick="editCert(${cert.id})"></i>
+                                <i class="fa fa-eye me-2 text-success" onclick="viewCert('${cert.file}')"></i>
+                                <i class="fa fa-plus me-2 text-dark"></i>
+                                <i class="fa fa-trash text-danger" onclick="deleteCert(${cert.id})"></i>
+                            </td>
+                        </tr>
+                    `);
+
+                });
+
+                $('#certModal').modal('hide');
+                showToast('Certificates added successfully');
+
+            } else {
+                showToast(res.message, 'error');
+            }
+        }
     });
+}
 
-    $("#certList").append(`<li>${title}</li>`);
-    $("#certModal").modal("hide");
-  }
+// $(document).on('click', '#save_cart', function () {
+//     saveCert();
+// });
 
-  /* =========================
+// function saveCert() {
+//     let title = $('#certTitle').val();
+//     let expiry = $('#certExpiry').val();
+
+//     certifications.push({
+//         title: title,
+//         expiry_date: expiry,
+//         file: certFile || ''
+//     });
+
+//     $('#certList').append(`<li>${title}</li>`);
+//     $('#certModal').modal('hide');
+// }
+
+/* =========================
    DROPZONE CERT
 ========================= */
   let certFile = "";

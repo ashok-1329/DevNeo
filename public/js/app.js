@@ -83,3 +83,24 @@ function clearErrors(form) {
     errors.forEach(e => e.remove());
 }
 
+function showToast(message, type = 'success') {
+
+    let bgClass = (type === 'error') ? 'bg-danger' : 'bg-success';
+
+    let toast = `
+        <div class="custom-toast ${bgClass}">
+            <i class="fa ${type === 'error' ? 'fa-times-circle' : 'fa-check-circle'} me-2"></i>
+            ${message}
+            <span class="close-toast" onclick="this.parentElement.remove()">×</span>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', toast);
+
+    setTimeout(() => {
+        document.querySelectorAll('.custom-toast').forEach(el => {
+            el.remove();
+        });
+    }, 3000);
+}
+

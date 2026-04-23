@@ -43,8 +43,8 @@ Route::middleware(['auth'])->group(function () {
         ->name('change.password.update');
 
 
-    Route::get('/users-data', [App\Http\Controllers\Admin\UserController::class, 'getUsers'])
-        ->name('users.data');
+    Route::get('/users-data', [UserController::class, 'getUsers'])
+    ->name('users.data');
     Route::resource('users', UserController::class);
 
     Route::post('/user-step', [UserController::class, 'handleStep'])
@@ -106,4 +106,3 @@ Route::middleware(['auth'])->group(function () {
 });
 
 require __DIR__ . '/auth.php';
-require __DIR__ . '/admin.php';

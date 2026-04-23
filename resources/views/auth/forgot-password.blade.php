@@ -1,5 +1,6 @@
 @extends('layouts.auth')
 @section('title', 'Forgot Password')
+@section('heading', 'Forgot Password')
 @section('content')
 
 <p class="text-muted mb-3">
@@ -21,10 +22,9 @@
         @enderror
     </div>
 
-    <div class="text-end">
-        <button class="btn btn-success">
-            Send Reset Link
-        </button>
+     <div class="d-flex justify-content-between">
+        <a href="{{ route('login') }}">Sign In</a>
+        <button class="btn btn-success">Send Reset Link</button>
     </div>
 
 </form>
