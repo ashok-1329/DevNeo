@@ -131,13 +131,16 @@
                                 <i class="fa fa-cash-register me-1"></i> Cashflow
                             </a>
                             <ul class="dropdown-menu">
-
                                 <li>
                                     <a class="dropdown-item" href="{{ route('suppliers.index') }}">
                                         <i class="fa fa-users me-2"></i> Manage Suppliers Register
                                     </a>
                                 </li>
-
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('payment-rules.index') }}">
+                                        <i class="fa fa-users me-2"></i> Payment Rules List
+                                    </a>
+                                </li>
                             </ul>
                         </li>
 

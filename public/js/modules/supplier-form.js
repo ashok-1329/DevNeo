@@ -1,5 +1,3 @@
-// ─── Supplier Form Validation (create & edit) ─────────────────────────────────
-
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("supplierForm");
   if (!form) return;
@@ -40,6 +38,8 @@ document.addEventListener("DOMContentLoaded", () => {
     },
     supplier_account_number: {
       required: true,
+      regex: /^\d+$/,
+      regexMsg: "Only numbers are allowed",
       maxLen: 50,
       label: "Account Number",
     },
@@ -66,7 +66,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function applyState(el, error) {
-    // Walk up to find the nearest .col-md-4 wrapper for the feedback element
     const col = el.closest(".col-md-4") || el.closest(".col-12");
     const fb = col ? col.querySelector(".invalid-feedback") : null;
     el.classList.toggle("is-invalid", !!error);
@@ -91,7 +90,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // ── Payment Term: auto-fill days display ──────────────────────────────────
   const termSelect = form.elements["payment_term_id"];
   const daysDisplay = document.getElementById("paymentTermDaysDisplay");
 
@@ -109,37 +107,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (termSelect) {
     termSelect.addEventListener("change", syncDaysDisplay);
-    // Run immediately so edit page shows current value on load
     syncDaysDisplay();
   }
 
-  // ── BSB auto-format: enforce DDD-DDD as you type ──────────────────────────
-  const bsbEl = form.elements["supplier_bsb_no"];
-  if (bsbEl) {
-    bsbEl.addEventListener("input", function () {
-      const cursorPos = this.selectionStart;
-      const raw = this.value.replace(/\D/g, "").slice(0, 6);
-      const formatted =
-        raw.length > 3 ? `${raw.slice(0, 3)}-${raw.slice(3)}` : raw;
-      this.value = formatted;
-      // Restore sensible cursor position
-      const newPos = cursorPos <= 3 ? cursorPos : cursorPos + 1;
-      try {
-        this.setSelectionRange(newPos, newPos);
-      } catch (_) {}
-    });
+  const f = form.elements;
 
-    // Also handle paste
-    bsbEl.addEventListener("paste", function (e) {
-      e.preventDefault();
-      const pasted = (e.clipboardData || window.clipboardData).getData("text");
-      const raw = pasted.replace(/\D/g, "").slice(0, 6);
-      this.value = raw.length > 3 ? `${raw.slice(0, 3)}-${raw.slice(3)}` : raw;
-      if (touched.has("supplier_bsb_no")) checkField(this);
-    });
-  }
+  const rules = {
+    supplier_bsb_no: (v) => {
+      v = v.replace(/\D/g, "").slice(0, 6);
+      return v.length > 3 ? v.slice(0, 3) + "-" + v.slice(3) : v;
+    },
+    supplier_phone: (v) => v.replace(/[^0-9+\-().\s]/g, ""),
+    supplier_account_number: (v) => v.replace(/\D/g, ""),
+  };
 
-  // ── ABN: digits only, max 11 ──────────────────────────────────────────────
+  Object.keys(rules).forEach((name) => {
+    const el = f[name];
+    if (!el) return;
+
+    ["input", "paste"].forEach((evt) =>
+      el.addEventListener(evt, (e) => {
+        if (evt === "paste") e.preventDefault();
+        const v =
+          evt === "paste"
+            ? (e.clipboardData || window.clipboardData).getData("text")
+            : e.target.value;
+
+        e.target.value = rules[name](v);
+      }),
+    );
+  });
+
   const abnEl = form.elements["supplier_abn"];
   if (abnEl) {
     abnEl.addEventListener("input", function () {
@@ -147,9 +145,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ── Form Submit ───────────────────────────────────────────────────────────
   form.addEventListener("submit", (e) => {
-    // Push Quill HTML into hidden input before validation
     if (window.quill) {
       const notesHidden = document.getElementById("supplierNotesHidden");
       if (notesHidden) notesHidden.value = quill.root.innerHTML;

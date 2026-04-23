@@ -79,7 +79,7 @@
                         <div class="input-group input-group-sm">
                             <span class="input-group-text bg-secondary text-light pt-1"><i class="fa fa-phone"></i></span>
                             {{-- FIX: type="text" (not "number") so +, -, spaces are allowed per PHONE regex --}}
-                            <input type="text" name="supplier_phone"
+                            <input type="number" name="supplier_phone"
                                 class="form-control @error('supplier_phone') is-invalid @enderror"
                                 placeholder="Enter phone number" value="{{ old('supplier_phone') }}">
                         </div>
@@ -165,7 +165,7 @@
                     <div class="col-md-4">
                         <label class="form-label fw-semibold small text-uppercase">Account Number <span
                                 class="text-danger">*</span></label>
-                        <input type="text" name="supplier_account_number"
+                        <input type="number" name="supplier_account_number"
                             class="form-control form-control-sm @error('supplier_account_number') is-invalid @enderror"
                             placeholder="Enter account number" value="{{ old('supplier_account_number') }}">
                         <p class="form-text mt-1">Check with bank about correct details – card numbers are not account

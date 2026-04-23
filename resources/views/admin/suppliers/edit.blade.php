@@ -83,7 +83,7 @@
                                 class="text-danger">*</span></label>
                         <div class="input-group input-group-sm">
                             <span class="input-group-text bg-secondary text-light pt-1"><i class="fa fa-phone"></i></span>
-                            <input type="tel" name="supplier_phone"
+                            <input type="number" name="supplier_phone"
                                 class="form-control @error('supplier_phone') is-invalid @enderror"
                                 placeholder="Enter phone number"
                                 value="{{ old('supplier_phone', $supplier->supplier_phone) }}">

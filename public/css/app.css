@@ -272,6 +272,10 @@ a {
     color: #666;
 }
 
+ul.dropdown-menu.show{
+    left: auto;
+}
+
 .navbar {
     /* background-color: rgb(124 156 63) !important; */
 }

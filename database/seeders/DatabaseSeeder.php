@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             PaymentTermSeeder::class,
             SeedData::class,
+            FrequencyPaymentSeeder::class,
         ]);
 
 

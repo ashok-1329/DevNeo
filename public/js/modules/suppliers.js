@@ -1,13 +1,8 @@
-// ─── Supplier Listing (DataTable) ────────────────────────────────────────────
-
 $(document).ready(function () {
   if (!$("#suppliersTable").length) return;
 
   const rankClass = { 1: "rank-1", 2: "rank-2", 3: "rank-3" };
 
-  // Column order must match index.blade.php <thead> exactly (11 columns):
-  // CATEGORY | BUSINESS NAME | EMAIL | PHONE | ABN | ACCOUNT EMAIL ADDRESS |
-  // PAYMENT TERM | ADDRESS | NOTES | SUPPLIER RANK | ACTION
   const table = $("#suppliersTable").DataTable({
     processing: true,
     ajax: { url: suppliersDataUrl, dataSrc: "" },
@@ -24,10 +19,8 @@ $(document).ready(function () {
       { data: "supplier_abn", defaultContent: "-" },
       { data: "supplier_bank_email", defaultContent: "-" },
       {
-        // Shows "30 Days (30d)" or just the name when days is null
         data: null,
         render: (d) => {
-          // Support both camelCase (paymentTerm) and snake_case (payment_term) relationship keys
           const term = d.paymentTerm || d.payment_term || null;
           if (!term) return "-";
           return d.payment_term_days != null
@@ -43,7 +36,6 @@ $(document).ready(function () {
         data: "supplier_notes",
         render: (d) => {
           if (!d) return '<span class="notes-cell">-</span>';
-          // Strip HTML tags for table display
           const stripped = d.replace(/<[^>]*>/g, "").trim();
           return `<span class="notes-cell">${stripped || "-"}</span>`;
         },
@@ -81,12 +73,10 @@ $(document).ready(function () {
     ],
   });
 
-  // Filter by category name (col 0)
   $("#filterCategory").on("change", function () {
     table.column(0).search(this.value).draw();
   });
 
-  // Filter by payment term name (col 6)
   $("#filterPaymentTerm").on("change", function () {
     table.column(6).search(this.value).draw();
   });
@@ -188,7 +178,6 @@ $(document).ready(function () {
   });
 });
 
-// ─── Shared Toast ─────────────────────────────────────────────────────────────
 
 function showToast(msg, type = "success") {
   const id = "toast_" + Date.now();

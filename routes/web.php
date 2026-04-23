@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\PaymentRuleController;
+use App\Http\Controllers\Admin\ProjectController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\UserController;
 
@@ -44,7 +46,7 @@ Route::middleware(['auth'])->group(function () {
 
 
     Route::get('/users-data', [UserController::class, 'getUsers'])
-    ->name('users.data');
+        ->name('users.data');
     Route::resource('users', UserController::class);
 
     Route::post('/user-step', [UserController::class, 'handleStep'])
@@ -92,6 +94,17 @@ Route::middleware(['auth'])->group(function () {
             return response($columns . "\n", 200, $headers);
         })->name('import.template');
     });
+
+    Route::get('payment-rules/data', [PaymentRuleController::class, 'getData'])
+        ->name('payment-rules.data');
+
+    Route::resource('payment-rules', PaymentRuleController::class);
+
+    // ── Projects (basic — expand as needed) ───────────────────────────────────────
+    Route::get('projects/data', [ProjectController::class, 'getData'])
+        ->name('projects.data');
+
+    Route::resource('projects', ProjectController::class)->only(['index', 'show']);
 
 
     // Route::get('/users/{id}/step2', [UserController::class, 'step2'])->name('users.step2');
