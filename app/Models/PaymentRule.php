@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class PaymentRule extends Model
 {
     protected $fillable = [
-        'supplier_name',        // stores supplier FK id
+        'supplier_name',
         'payment_date',
         'frequency_payment_id',
         'payment_terms',

@@ -24,7 +24,7 @@ $(document).ready(function () {
           const term = d.paymentTerm || d.payment_term || null;
           if (!term) return "-";
           return d.payment_term_days != null
-            ? `${term.name} <span class="text-muted small">(${d.payment_term_days}d)</span>`
+            ? `${term.name}`
             : term.name;
         },
       },
@@ -52,7 +52,7 @@ $(document).ready(function () {
             `<option value="2" ${rank == 2 ? "selected" : ""}>Use With Caution</option>`,
             `<option value="3" ${rank == 3 ? "selected" : ""}>Satisfactory</option>`,
           ].join("");
-          return `<select class="rank-select ${cls}" data-id="${data.id}">${opts}</select>`;
+          return `<select class="form-control rank-select ${cls}" data-id="${data.id}">${opts}</select>`;
         },
       },
       {
@@ -179,18 +179,18 @@ $(document).ready(function () {
 });
 
 
-function showToast(msg, type = "success") {
-  const id = "toast_" + Date.now();
-  const html = `
-    <div id="${id}" class="toast align-items-center text-white bg-${type} border-0 position-fixed bottom-0 end-0 m-3"
-         role="alert" style="z-index:9999">
-      <div class="d-flex">
-        <div class="toast-body">${msg}</div>
-        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-      </div>
-    </div>`;
-  $("body").append(html);
-  const el = document.getElementById(id);
-  new bootstrap.Toast(el, { delay: 3000 }).show();
-  el.addEventListener("hidden.bs.toast", () => el.remove());
-}
+// function showToast(msg, type = "success") {
+//   const id = "toast_" + Date.now();
+//   const html = `
+//     <div id="${id}" class="toast align-items-center text-white bg-${type} border-0 position-fixed bottom-0 end-0 m-3"
+//          role="alert" style="z-index:9999">
+//       <div class="d-flex">
+//         <div class="toast-body">${msg}</div>
+//         <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+//       </div>
+//     </div>`;
+//   $("body").append(html);
+//   const el = document.getElementById(id);
+//   new bootstrap.Toast(el, { delay: 3000 }).show();
+//   el.addEventListener("hidden.bs.toast", () => el.remove());
+// }

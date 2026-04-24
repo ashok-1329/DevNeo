@@ -31,7 +31,7 @@
                         <label class="form-label fw-semibold small text-uppercase">Category <span
                                 class="text-danger">*</span></label>
                         <select name="supplier_category"
-                            class="form-select form-select-sm @error('supplier_category') is-invalid @enderror">
+                            class="form-control form-select @error('supplier_category') is-invalid @enderror">
                             <option value="">Select</option>
                             @foreach ($categories as $cat)
                                 <option value="{{ $cat->id }}"
@@ -50,7 +50,7 @@
                         <label class="form-label fw-semibold small text-uppercase">Business Name <span
                                 class="text-danger">*</span></label>
                         <input type="text" name="supplier_name"
-                            class="form-control form-control-sm @error('supplier_name') is-invalid @enderror"
+                            class="form-control @error('supplier_name') is-invalid @enderror"
                             placeholder="Enter supplier name" value="{{ old('supplier_name') }}">
                         <div class="invalid-feedback">
                             @error('supplier_name')
@@ -62,7 +62,7 @@
                         <label class="form-label fw-semibold small text-uppercase">Email <span
                                 class="text-danger">*</span></label>
                         <input type="email" name="supplier_email"
-                            class="form-control form-control-sm @error('supplier_email') is-invalid @enderror"
+                            class="form-control @error('supplier_email') is-invalid @enderror"
                             placeholder="Enter supplier email" value="{{ old('supplier_email') }}">
                         <div class="invalid-feedback">
                             @error('supplier_email')
@@ -76,7 +76,7 @@
                     <div class="col-md-4">
                         <label class="form-label fw-semibold small text-uppercase">Phone <span
                                 class="text-danger">*</span></label>
-                        <div class="input-group input-group-sm">
+                        <div class="input-group ">
                             <span class="input-group-text bg-secondary text-light pt-1"><i class="fa fa-phone"></i></span>
                             {{-- FIX: type="text" (not "number") so +, -, spaces are allowed per PHONE regex --}}
                             <input type="number" name="supplier_phone"
@@ -93,7 +93,7 @@
                         <label class="form-label fw-semibold small text-uppercase">ABN <span
                                 class="text-danger">*</span></label>
                         <input type="text" name="supplier_abn"
-                            class="form-control form-control-sm @error('supplier_abn') is-invalid @enderror"
+                            class="form-control @error('supplier_abn') is-invalid @enderror"
                             placeholder="Enter ABN number (11 digits)" maxlength="11" value="{{ old('supplier_abn') }}">
                         <div class="invalid-feedback">
                             @error('supplier_abn')
@@ -105,7 +105,7 @@
                         <label class="form-label fw-semibold small text-uppercase">Address <span
                                 class="text-danger">*</span></label>
                         <textarea name="supplier_address" rows="3"
-                            class="form-control form-control-sm @error('supplier_address') is-invalid @enderror"
+                            class="form-control @error('supplier_address') is-invalid @enderror"
                             placeholder="Enter supplier address">{{ old('supplier_address') }}</textarea>
                         <div class="invalid-feedback">
                             @error('supplier_address')
@@ -120,7 +120,7 @@
                         <label class="form-label fw-semibold small text-uppercase">Account Email Address <span
                                 class="text-danger">*</span></label>
                         <input type="email" name="supplier_bank_email"
-                            class="form-control form-control-sm @error('supplier_bank_email') is-invalid @enderror"
+                            class="form-control @error('supplier_bank_email') is-invalid @enderror"
                             placeholder="Enter email address" value="{{ old('supplier_bank_email') }}">
                         <div class="invalid-feedback">
                             @error('supplier_bank_email')
@@ -142,7 +142,7 @@
                         <label class="form-label fw-semibold small text-uppercase">Bank Name <span
                                 class="text-danger">*</span></label>
                         <input type="text" name="supplier_bank_name"
-                            class="form-control form-control-sm @error('supplier_bank_name') is-invalid @enderror"
+                            class="form-control @error('supplier_bank_name') is-invalid @enderror"
                             placeholder="Enter bank name" value="{{ old('supplier_bank_name') }}">
                         <div class="invalid-feedback">
                             @error('supplier_bank_name')
@@ -154,7 +154,7 @@
                         <label class="form-label fw-semibold small text-uppercase">BSB No. <span
                                 class="text-danger">*</span></label>
                         <input type="text" name="supplier_bsb_no"
-                            class="form-control form-control-sm @error('supplier_bsb_no') is-invalid @enderror"
+                            class="form-control @error('supplier_bsb_no') is-invalid @enderror"
                             placeholder="000-000" maxlength="7" value="{{ old('supplier_bsb_no') }}">
                         <div class="invalid-feedback">
                             @error('supplier_bsb_no')
@@ -166,7 +166,7 @@
                         <label class="form-label fw-semibold small text-uppercase">Account Number <span
                                 class="text-danger">*</span></label>
                         <input type="number" name="supplier_account_number"
-                            class="form-control form-control-sm @error('supplier_account_number') is-invalid @enderror"
+                            class="form-control @error('supplier_account_number') is-invalid @enderror"
                             placeholder="Enter account number" value="{{ old('supplier_account_number') }}">
                         <p class="form-text mt-1">Check with bank about correct details – card numbers are not account
                             numbers</p>
@@ -183,7 +183,7 @@
                         <label class="form-label fw-semibold small text-uppercase">Account Name <span
                                 class="text-danger">*</span></label>
                         <input type="text" name="supplier_account_name"
-                            class="form-control form-control-sm @error('supplier_account_name') is-invalid @enderror"
+                            class="form-control @error('supplier_account_name') is-invalid @enderror"
                             placeholder="Enter account name" value="{{ old('supplier_account_name') }}">
                         <div class="invalid-feedback">
                             @error('supplier_account_name')
@@ -195,10 +195,9 @@
                         <label class="form-label fw-semibold small text-uppercase">Payment Term <span
                                 class="text-danger">*</span></label>
                         <select name="payment_term_id"
-                            class="form-select form-select-sm @error('payment_term_id') is-invalid @enderror">
+                            class="form-control form-select @error('payment_term_id') is-invalid @enderror">
                             <option value="">Select Payment Term</option>
                             @foreach ($paymentTerms as $pt)
-                                {{-- data-days is used by JS to populate the read-only days field --}}
                                 <option value="{{ $pt->id }}" data-days="{{ $pt->days ?? '' }}"
                                     {{ old('payment_term_id') == $pt->id ? 'selected' : '' }}>
                                     {{ $pt->name }}
@@ -211,19 +210,23 @@
                             @enderror
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    {{-- <div class="col-md-4">
                         <label class="form-label fw-semibold small text-uppercase">Payment Days</label>
                         <input type="text" id="paymentTermDaysDisplay" class="form-control form-control-sm"
                             placeholder="Auto-filled on selection" readonly tabindex="-1">
-                    </div>
+                    </div> --}}
                 </div>
 
             </div>
 
-            <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-            <input type="hidden" name="supplier_notes" id="supplierNotesHidden" value="{{ old('supplier_notes') }}">
-            <div id="editor" style="height:180px;"></div>
-            <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+            <div>
+                <label class="form-label fw-semibold small text-uppercase">Notes</label>
+                <input type="hidden" name="supplier_notes" id="supplierNotesHidden"
+                value="{{ old('supplier_notes') }}">
+                <div id="editor" style="height:180px;"></div>
+                <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+                <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+            </div>
             <script>
                 var quill = new Quill('#editor', {
                     theme: 'snow'

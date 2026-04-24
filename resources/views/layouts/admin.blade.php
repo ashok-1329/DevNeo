@@ -12,6 +12,7 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" />
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/css/dropify.min.css">
 </head>
 
 <body>
@@ -120,9 +121,27 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('projects.index') }}">
+                            <a class="nav-link dropdown-toggle" href="#" id="registerDropdown" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="fa fa-diagram-project me-1"></i> Projects
                             </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('clients.index') }}">
+                                        <i class="fa fa-users me-2"></i> Manage Clients
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('diary-products.index') }}">
+                                        <i class="fa fa-users me-2"></i> Manage Diary Products
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('admin.project.labour.index') }}">
+                                        <i class="fa fa-users me-2"></i> Manage Labour Register
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
 
                         <li class="nav-item">
@@ -198,7 +217,9 @@
     </div>
 
     @include('components.dashboardFooter')
-
+    <script src="{{ asset('js/components/dropzone-component.js') }}"></script>
+    <script src="{{ asset('js/modules/payment-rule-form.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/js/dropify.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

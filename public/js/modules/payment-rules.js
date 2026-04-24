@@ -17,47 +17,27 @@ $(document).ready(function () {
         data: null,
         render: (d) => (d.supplier ? d.supplier.supplier_name : "-"),
       },
+      { data: "project_number", defaultContent: "-" },
       {
         data: "payment_date",
-        render: (d) => {
-          if (!d) return "-";
-
-          const date = new Date(d);
-
-          return date.toLocaleDateString(undefined, {
-            year: "numeric",
-            month: "short",
-            day: "2-digit",
-          });
-        },
+        render: (d) => formatDate(d),
+      },
+      {
+        data: "end_date",
+        render: (d) => formatDate(d),
       },
       {
         data: null,
         render: (d) => (d.frequency_payment ? d.frequency_payment.name : "-"),
       },
-      {
-        data: "end_date",
-        render: (d) => {
-          if (!d) return "-";
-
-          const date = new Date(d);
-
-          return date.toLocaleDateString(undefined, {
-            year: "numeric",
-            month: "short",
-            day: "2-digit",
-          });
-        },
-      },
-      {
-        data: "value_inc_gst",
-        render: (d) =>
-          d
-            ? `<span class="fw-semibold">$${Number(d).toLocaleString("en-AU", { minimumFractionDigits: 2 })}</span>`
-            : "-",
-      },
-      { data: "project_number", defaultContent: "-" },
-      { data: "project_code", defaultContent: "-" },
+      // {
+      //   data: "value_inc_gst",
+      //   render: (d) =>
+      //     d
+      //       ? `<span class="fw-semibold">$${Number(d).toLocaleString("en-AU", { minimumFractionDigits: 2 })}</span>`
+      //       : "-",
+      // },
+      // { data: "project_code", defaultContent: "-" },
       {
         data: "status",
         orderable: false,
@@ -162,20 +142,32 @@ $(document).ready(function () {
   });
 });
 
-function showToast(msg, type = "success") {
-  const id = "toast_" + Date.now();
-  const html = `
-    <div id="${id}"
-         class="toast align-items-center text-white bg-${type} border-0 position-fixed bottom-0 end-0 m-3"
-         role="alert" style="z-index:9999">
-      <div class="d-flex">
-        <div class="toast-body">${msg}</div>
-        <button type="button" class="btn-close btn-close-white me-2 m-auto"
-                data-bs-dismiss="toast"></button>
-      </div>
-    </div>`;
-  $("body").append(html);
-  const el = document.getElementById(id);
-  new bootstrap.Toast(el, { delay: 3000 }).show();
-  el.addEventListener("hidden.bs.toast", () => el.remove());
+// function showToast(msg, type = "success") {
+//   const id = "toast_" + Date.now();
+//   const html = `
+//     <div id="${id}"
+//          class="toast align-items-center text-white bg-${type} border-0 position-fixed bottom-0 end-0 m-3"
+//          role="alert" style="z-index:9999">
+//       <div class="d-flex">
+//         <div class="toast-body">${msg}</div>
+//         <button type="button" class="btn-close btn-close-white me-2 m-auto"
+//                 data-bs-dismiss="toast"></button>
+//       </div>
+//     </div>`;
+//   $("body").append(html);
+//   const el = document.getElementById(id);
+//   new bootstrap.Toast(el, { delay: 3000 }).show();
+//   el.addEventListener("hidden.bs.toast", () => el.remove());
+// }
+
+function formatDate(d) {
+  if (!d) return "-";
+
+  const date = new Date(d);
+
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+
+  return `${day}/${month}/${year}`;
 }

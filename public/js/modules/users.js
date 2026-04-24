@@ -257,49 +257,8 @@ function saveCert() {
     });
 }
 
-// $(document).on('click', '#save_cart', function () {
-//     saveCert();
-// });
-
-// function saveCert() {
-//     let title = $('#certTitle').val();
-//     let expiry = $('#certExpiry').val();
-
-//     certifications.push({
-//         title: title,
-//         expiry_date: expiry,
-//         file: certFile || ''
-//     });
-
-//     $('#certList').append(`<li>${title}</li>`);
-//     $('#certModal').modal('hide');
-// }
-
-/* =========================
-   DROPZONE CERT
-========================= */
   let certFile = "";
 
-  // if (document.querySelector("#certDropzone")) {
-  //     new Dropzone("#certDropzone", {
-  //         url: "/upload-cert",
-  //         success: function(file, response) {
-  //             certFile = response.file;
-  //         }
-  //     });
-  // }
-
-  /* =========================
-   DROPZONE CONTRACT
-========================= */
-  // if (document.querySelector("#contractDropzone")) {
-  //     new Dropzone("#contractDropzone", {
-  //         url: "/upload-contract",
-  //         success: function(file, response) {
-  //             contractFile = response.file;
-  //         }
-  //     });
-  // }
 
   function validateStep(step) {
     let isValid = true;

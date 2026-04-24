@@ -34,17 +34,17 @@
             <div class="row g-3 mb-3">
                 <div class="col-md-4">
                     <label class="form-label fw-semibold small text-uppercase">Category</label>
-                    <input type="text" class="form-control form-control-sm show-readonly"
+                    <input type="text" class="form-control show-readonly"
                         value="{{ $supplier->category->name ?? '-' }}" readonly>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-semibold small text-uppercase">Business Name</label>
-                    <input type="text" class="form-control form-control-sm show-readonly"
+                    <input type="text" class="form-control show-readonly"
                         value="{{ $supplier->supplier_name ?? '-' }}" readonly>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-semibold small text-uppercase">Email</label>
-                    <input type="text" class="form-control form-control-sm show-readonly"
+                    <input type="text" class="form-control show-readonly"
                         value="{{ $supplier->supplier_email ?? '-' }}" readonly>
                 </div>
             </div>
@@ -53,7 +53,7 @@
             <div class="row g-3 mb-3">
                 <div class="col-md-4">
                     <label class="form-label fw-semibold small text-uppercase">Phone</label>
-                    <div class="input-group input-group-sm">
+                    <div class="input-group ">
                         <span class="input-group-text bg-secondary text-light pt-1">
                             <i class="fa fa-phone"></i>
                         </span>
@@ -63,12 +63,12 @@
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-semibold small text-uppercase">ABN</label>
-                    <input type="text" class="form-control form-control-sm show-readonly"
+                    <input type="text" class="form-control show-readonly"
                         value="{{ $supplier->supplier_abn ?? '-' }}" readonly>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-semibold small text-uppercase">Address</label>
-                    <textarea class="form-control form-control-sm show-readonly" rows="3" readonly>{{ $supplier->supplier_address ?? '-' }}</textarea>
+                    <textarea class="form-control show-readonly" rows="3" readonly>{{ $supplier->supplier_address ?? '-' }}</textarea>
                 </div>
             </div>
 
@@ -76,7 +76,7 @@
             <div class="row g-3">
                 <div class="col-md-4">
                     <label class="form-label fw-semibold small text-uppercase">Account Email Address</label>
-                    <input type="text" class="form-control form-control-sm show-readonly"
+                    <input type="text" class="form-control show-readonly"
                         value="{{ $supplier->supplier_bank_email ?? '-' }}" readonly>
                 </div>
             </div>
@@ -93,17 +93,17 @@
             <div class="row g-3 mb-3">
                 <div class="col-md-4">
                     <label class="form-label fw-semibold small text-uppercase">Bank Name</label>
-                    <input type="text" class="form-control form-control-sm show-readonly"
+                    <input type="text" class="form-control show-readonly"
                         value="{{ $supplier->supplier_bank_name ?? '-' }}" readonly>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-semibold small text-uppercase">BSB No.</label>
-                    <input type="text" class="form-control form-control-sm show-readonly"
+                    <input type="text" class="form-control show-readonly"
                         value="{{ $supplier->supplier_bsb_no ?? '-' }}" readonly>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-semibold small text-uppercase">Account Number</label>
-                    <input type="text" class="form-control form-control-sm show-readonly"
+                    <input type="text" class="form-control show-readonly"
                         value="{{ $supplier->supplier_account_number ?? '-' }}" readonly>
                     <p class="form-text mt-1">
                         Check with bank about correct details – card numbers are not account numbers
@@ -115,20 +115,20 @@
             <div class="row g-3">
                 <div class="col-md-4">
                     <label class="form-label fw-semibold small text-uppercase">Account Name</label>
-                    <input type="text" class="form-control form-control-sm show-readonly"
+                    <input type="text" class="form-control show-readonly"
                         value="{{ $supplier->supplier_account_name ?? '-' }}" readonly>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-semibold small text-uppercase">Payment Term</label>
                     {{-- FIX: use the eager-loaded relationship instead of non-existent payment_terms attribute --}}
-                    <input type="text" class="form-control form-control-sm show-readonly"
+                    <input type="text" class="form-control show-readonly"
                         value="{{ $supplier->paymentTerm->name ?? '-' }}" readonly>
                 </div>
-                <div class="col-md-4">
+                {{-- <div class="col-md-4">
                     <label class="form-label fw-semibold small text-uppercase">Payment Days</label>
-                    <input type="text" class="form-control form-control-sm show-readonly"
+                    <input type="text" class="form-control show-readonly"
                         value="{{ $supplier->payment_term_days ? $supplier->payment_term_days . ' days' : '-' }}" readonly>
-                </div>
+                </div> --}}
             </div>
 
         </div>{{-- /supplier-form-body --}}
@@ -136,7 +136,7 @@
         {{-- ── Notes ── --}}
         <div class="supplier-form-body mb-4">
             <label class="form-label fw-semibold small text-uppercase">Notes</label>
-            <div class="show-notes-display">
+            <div id="notes-Boxcss">
                 {!! $supplier->supplier_notes ?? '<span class="text-muted">No notes.</span>' !!}
             </div>
         </div>
@@ -144,52 +144,3 @@
     </div>
 @endsection
 
-@push('styles')
-    <style>
-        .ls-1 {
-            letter-spacing: .05em;
-        }
-
-        .supplier-form-body {
-            background: #fff;
-            border: 1px solid #dee2e6;
-            border-radius: 0.375rem;
-            padding: 1.25rem;
-        }
-
-        /* Readonly inputs look like the form but are not editable */
-        .show-readonly {
-            background-color: #f0f2f5 !important;
-            cursor: default !important;
-            color: #212529 !important;
-            border-color: #dee2e6 !important;
-            box-shadow: none !important;
-        }
-
-        .show-readonly:focus {
-            outline: none !important;
-            box-shadow: none !important;
-            border-color: #dee2e6 !important;
-        }
-
-        textarea.show-readonly {
-            resize: none;
-        }
-
-        /* Notes display styled like Quill read-only output */
-        .show-notes-display {
-            background-color: #f0f2f5;
-            border: 1px solid #dee2e6;
-            border-radius: 0.375rem;
-            min-height: 120px;
-            padding: 0.75rem 1rem;
-            font-size: 0.875rem;
-            color: #212529;
-            line-height: 1.6;
-        }
-
-        .show-notes-display p {
-            margin-bottom: 0.25rem;
-        }
-    </style>
-@endpush

@@ -11,7 +11,7 @@
             <div class="row g-2 align-items-end">
                 <div class="col-auto">
                     <label class="form-label fw-semibold small mb-1 text-light">CATEGORY:</label>
-                    <select id="filterCategory" class="form-select form-select-sm" style="min-width:160px">
+                    <select id="filterCategory" class="form-control" style="min-width:160px">
                         <option value="">All Categories</option>
                         @foreach ($categories as $cat)
                             <option value="{{ $cat->name }}">{{ $cat->name }}</option>
@@ -21,7 +21,7 @@
                 <div class="col-auto">
                     <label class="form-label fw-semibold small mb-1 text-light">PAYMENT TERM</label>
                     {{-- FIX: value must be the term name (string) so DataTable column search matches --}}
-                    <select id="filterPaymentTerm" class="form-select form-select-sm" style="min-width:180px">
+                    <select id="filterPaymentTerm" class="form-control" style="min-width:180px">
                         <option value="">Select Payment Term</option>
                         @foreach ($paymentTerms as $pt)
                             <option value="{{ $pt->name }}">{{ $pt->name }}</option>

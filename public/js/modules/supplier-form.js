@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const col = el.closest(".col-md-4") || el.closest(".col-12");
     const fb = col ? col.querySelector(".invalid-feedback") : null;
     el.classList.toggle("is-invalid", !!error);
-    el.classList.toggle("is-valid", !error && touched.has(el.name));
+    // el.classList.toggle("is-valid", !error && touched.has(el.name));
     if (fb) fb.textContent = error || "";
   }
 

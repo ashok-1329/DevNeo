@@ -1,43 +1,65 @@
+/**
+ * payment-rule-form.js
+ * ──────────────────────────────────────────────────────────────────
+ * Handles validation for both Add and Edit Payment Rule forms.
+ *
+ * File-upload behaviour is delegated entirely to DropzoneComponent
+ * (dropzone-component.js).  This script only performs field-level
+ * validation and listens to the dz:change / dz:clear events emitted
+ * by the dropzone wrapper.
+ * ──────────────────────────────────────────────────────────────────
+ */
+
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("paymentRuleForm");
   if (!form) return;
 
-  // ── Date constraints: no past dates ────────────────────────────────────────
-  const today = new Date().toISOString().split("T")[0];
+  /* ─── Helpers ──────────────────────────────────────────────── */
 
-  const paymentDateEl = form.elements["payment_date"];
-  const endDateEl     = form.elements["end_date"];
-
-  if (paymentDateEl) {
-    paymentDateEl.setAttribute("min", today);
-    // Pre-fill with today only when creating (empty value)
-    if (!paymentDateEl.value) paymentDateEl.value = today;
+  function isEditMode() {
+    return !!form.querySelector('input[name="_method"]');
   }
 
-  if (endDateEl) {
-    endDateEl.setAttribute("min", today);
+  /** Get today as YYYY-MM-DD in local time */
+  function todayISO() {
+    const d = new Date();
+    return [
+      d.getFullYear(),
+      String(d.getMonth() + 1).padStart(2, "0"),
+      String(d.getDate()).padStart(2, "0"),
+    ].join("-");
   }
 
-  // ── Project number → auto-fill project code ────────────────────────────────
-  const projectSelect  = document.getElementById("project_number_select");
-  const projectCodeEl  = form.elements["project_code"];
-  const projectNumEl   = form.elements["project_number"];
+  const today = todayISO();
+
+  /** Parse dd/mm/yyyy → YYYY-MM-DD for comparison */
+  function parseDisplayDate(val) {
+    if (!val) return "";
+    const parts = val.split("/");
+    if (parts.length !== 3) return "";
+    return `${parts[2]}-${parts[1]}-${parts[0]}`;
+  }
+
+  /* ─── Project number ↔ project code sync ───────────────────── */
+
+  const projectSelect = document.getElementById("project_number_select");
+  const projectCodeEl = form.elements["project_code"];
+  const projectNumEl = form.elements["project_number"];
 
   if (projectSelect) {
     function syncProjectCode() {
       const opt = projectSelect.options[projectSelect.selectedIndex];
       if (opt && opt.value) {
-        if (projectNumEl)  projectNumEl.value  = opt.dataset.number || "";
-        if (projectCodeEl) projectCodeEl.value = opt.dataset.code   || "";
+        if (projectNumEl) projectNumEl.value = opt.dataset.number || "";
+        if (projectCodeEl) projectCodeEl.value = opt.dataset.code || "";
       } else {
-        if (projectNumEl)  projectNumEl.value  = "";
+        if (projectNumEl) projectNumEl.value = "";
         if (projectCodeEl) projectCodeEl.value = "";
       }
     }
-
     projectSelect.addEventListener("change", syncProjectCode);
 
-    // On edit: restore the selected option that matches the stored project_number
+    // Restore selection on edit
     const storedNumber = projectNumEl ? projectNumEl.value : "";
     if (storedNumber) {
       for (let i = 0; i < projectSelect.options.length; i++) {
@@ -50,130 +72,149 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // ── Value (inc. GST) — digits + decimals only ──────────────────────────────
+  /* ─── Value (inc. GST) — digits + up-to-2 decimals ────────── */
+
   const valueEl = form.elements["value_inc_gst"];
   if (valueEl) {
     valueEl.addEventListener("input", function () {
-      // Allow digits, single decimal point, two decimal places
       let v = this.value.replace(/[^0-9.]/g, "");
       const parts = v.split(".");
       if (parts.length > 2) v = parts[0] + "." + parts.slice(1).join("");
-      if (parts[1] && parts[1].length > 2) v = parts[0] + "." + parts[1].slice(0, 2);
+      if (parts[1] && parts[1].length > 2)
+        v = parts[0] + "." + parts[1].slice(0, 2);
       this.value = v;
     });
   }
 
-  // ── File upload — drag & drop preview ──────────────────────────────────────
-  const dropZone   = document.getElementById("dropZone");
-  const fileInput  = document.getElementById("documentInput");
-  const previewWrap = document.getElementById("uploadPreview");
+  /* ─── Validation rules ─────────────────────────────────────── */
 
-  function renderPreview(file) {
-    if (!previewWrap) return;
-    previewWrap.innerHTML = "";
+  /*
+   * documentRequired:
+   *   – Create mode  → required
+   *   – Edit mode    → optional (keep existing if blank)
+   */
+  const documentRequired = !isEditMode();
 
-    if (file.type.startsWith("image/")) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        previewWrap.innerHTML = `
-          <div class="upload-preview-item">
-            <img src="${e.target.result}" alt="preview" style="width: 360px">
-            <br>
-            <span class="upload-preview-name">${file.name}</span>
-          </div>`;
-      };
-      reader.readAsDataURL(file);
-    } else {
-      const iconMap = {
-        "application/pdf":  "fa-file-pdf text-danger",
-        "application/msword": "fa-file-word text-primary",
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "fa-file-word text-primary",
-      };
-      const icon = iconMap[file.type] || "fa-file text-secondary";
-      previewWrap.innerHTML = `
-        <div class="upload-preview-item upload-file-item">
-          <i class="fa ${icon} fa-3x mb-2"></i>
-          <span class="upload-preview-name">${file.name}</span>
-        </div>`;
-    }
-  }
-
-  if (fileInput) {
-    fileInput.addEventListener("change", function () {
-      if (this.files[0]) renderPreview(this.files[0]);
-    });
-  }
-
-  if (dropZone && fileInput) {
-    dropZone.addEventListener("click",      () => fileInput.click());
-    dropZone.addEventListener("dragover",   (e) => { e.preventDefault(); dropZone.classList.add("drag-over"); });
-    dropZone.addEventListener("dragleave",  ()  => dropZone.classList.remove("drag-over"));
-    dropZone.addEventListener("drop", (e) => {
-      e.preventDefault();
-      dropZone.classList.remove("drag-over");
-      const file = e.dataTransfer.files[0];
-      if (file) {
-        // Transfer to file input via DataTransfer
-        const dt = new DataTransfer();
-        dt.items.add(file);
-        fileInput.files = dt.files;
-        renderPreview(file);
-      }
-    });
-  }
-
-  // ── Validation rules ────────────────────────────────────────────────────────
   const RULES = {
-    supplier_name:        { required: true,  label: "Supplier Name" },
-    payment_date:         { required: true,  label: "Payment Date",  isDate: true },
-    frequency_payment_id: { required: true,  label: "Frequency of Payment" },
-    end_date:             { required: true,  label: "End Date",      isDate: true },
-    value_inc_gst:        { required: true,  label: "Value (inc. GST)" },
-    project_number_select:{ required: true,  label: "Project Number" },
-    project_code:         { required: false },   // auto-filled, not user-validated
-    payment_description:  { required: true,  label: "Payment Description" },
-    documentInput:        { required: !isEditMode(), label: "Supporting Document", isFile: true },
+    supplier_name: {
+      required: true,
+      label: "Supplier Name",
+    },
+    payment_date: {
+      required: true,
+      label: "Payment Date",
+      isDisplayDate: true,
+    },
+    frequency_payment_id: {
+      required: true,
+      label: "Frequency of Payment",
+    },
+    end_date: {
+      required: true,
+      label: "End Date",
+      isDisplayDate: true,
+    },
+    value_inc_gst: {
+      required: true,
+      label: "Value (inc. GST)",
+    },
+    project_number_select: {
+      required: true,
+      label: "Project Number",
+    },
+    // project_code is auto-filled → not validated
+    payment_description: {
+      required: true,
+      label: "Payment Description",
+    },
+    _document: {
+      required: documentRequired,
+      label: "Supporting Document",
+      isFile: true,
+    },
   };
 
-  function isEditMode() {
-    // Edit forms contain a hidden _method=PUT input
-    return !!form.querySelector('input[name="_method"]');
+  /* ─── Element resolution ───────────────────────────────────── */
+
+  function getEl(name) {
+    if (name === "project_number_select")
+      return document.getElementById("project_number_select");
+    if (name === "_document")
+      return form.querySelector('input[type="file"][name="document"]');
+    return form.elements[name] || null;
   }
 
-  const touched = new Set();
+  /* ─── Per-field validate ───────────────────────────────────── */
 
   function validate(name, el) {
-    const r = RULES[name];
-    if (!r) return null;
-    const val = el.value ? el.value.trim() : "";
+    if (!el) return null;
+    const rule = RULES[name];
+    if (!rule) return null;
 
-    if (r.required && !val) return `${r.label} is required.`;
+    const val = (el.value || "").trim();
 
-    if (r.isDate && val) {
-      if (val < today) return `${r.label} cannot be in the past.`;
+    // Required check
+    if (rule.required) {
+      if (rule.isFile) {
+        if (!el.files || el.files.length === 0) {
+          return `${rule.label} is required.`;
+        }
+        return null;
+      }
+      if (!val) return `${rule.label} is required.`;
     }
 
-    if (r.isFile && el.files && el.files.length === 0 && !isEditMode()) {
-      return `${r.label} is required.`;
+    // Date validation (display format dd/mm/yyyy)
+    if (rule.isDisplayDate && val) {
+      const iso = parseDisplayDate(val);
+      if (iso && iso < today) {
+        return `${rule.label} cannot be in the past.`;
+      }
     }
 
     return null;
   }
 
-  function getEl(name) {
-    if (name === "project_number_select") return document.getElementById("project_number_select");
-    if (name === "documentInput")         return document.getElementById("documentInput");
-    return form.elements[name] || null;
+  /* ─── Apply / clear invalid state ─────────────────────────── */
+
+  function getWrapper(el) {
+    return (
+      el.closest(".col-md-4") ||
+      el.closest(".col-12") ||
+      el.closest(".dz-component") ||
+      null
+    );
   }
 
   function applyState(name, el, error) {
     if (!el) return;
-    const wrapper = el.closest(".col-md-4") || el.closest(".col-12") || el.closest(".upload-zone-wrapper");
-    const fb = wrapper ? wrapper.querySelector(".invalid-feedback") : null;
+
+    // For file inputs the dz-component handles its own feedback
+    if (name === "_document") {
+      const dzWrapper = el.closest(".dz-component");
+      if (dzWrapper) {
+        const fb = dzWrapper.querySelector(".dz-feedback");
+        const zone = dzWrapper.querySelector(".dz-drop-zone");
+        if (fb) {
+          fb.textContent = error || "";
+          fb.classList.toggle("dz-feedback-visible", !!error);
+        }
+        if (zone) zone.classList.toggle("dz-border-danger", !!error);
+      }
+      return;
+    }
+
     el.classList.toggle("is-invalid", !!error);
-    el.classList.toggle("is-valid",   !error && touched.has(name));
-    if (fb) fb.textContent = error || "";
+    const wrapper = getWrapper(el);
+    if (wrapper) {
+      const fb = wrapper.querySelector(".invalid-feedback");
+      if (fb) fb.textContent = error || "";
+    }
   }
+
+  /* ─── Touched tracking ─────────────────────────────────────── */
+
+  const touched = new Set();
 
   function checkField(name) {
     touched.add(name);
@@ -183,21 +224,38 @@ document.addEventListener("DOMContentLoaded", () => {
     return !error;
   }
 
+  // Attach blur/change/input listeners
   Object.keys(RULES).forEach((name) => {
     const el = getEl(name);
     if (!el) return;
-    el.addEventListener("blur",   () => checkField(name));
+    el.addEventListener("blur", () => checkField(name));
     el.addEventListener("change", () => checkField(name));
-    el.addEventListener("input",  () => { if (touched.has(name)) checkField(name); });
+    el.addEventListener("input", () => {
+      if (touched.has(name)) checkField(name);
+    });
   });
 
-  // ── Submit ─────────────────────────────────────────────────────────────────
+  /* ─── Dropzone events (re-validate on file add/remove) ────── */
+
+  const dzWrapper = form.querySelector(".dz-component");
+  if (dzWrapper) {
+    dzWrapper.addEventListener("dz:change", () => {
+      touched.add("_document");
+      checkField("_document");
+    });
+    dzWrapper.addEventListener("dz:clear", () => {
+      if (touched.has("_document")) checkField("_document");
+    });
+  }
+
+  /* ─── Submit ───────────────────────────────────────────────── */
+
   form.addEventListener("submit", (e) => {
     let allValid = true;
+
     Object.keys(RULES).forEach((name) => {
       touched.add(name);
       const el = getEl(name);
-      if (!el) return;
       const error = validate(name, el);
       applyState(name, el, error);
       if (error) allValid = false;
@@ -205,8 +263,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!allValid) {
       e.preventDefault();
-      const firstInvalid = form.querySelector(".is-invalid");
-      if (firstInvalid) firstInvalid.scrollIntoView({ behavior: "smooth", block: "center" });
+      const firstInvalid =
+        form.querySelector(".is-invalid") ||
+        form.querySelector(".dz-border-danger");
+      if (firstInvalid) {
+        firstInvalid.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
     }
   });
 });

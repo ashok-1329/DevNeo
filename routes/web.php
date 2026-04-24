@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ClientController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -7,6 +8,8 @@ use App\Http\Controllers\Admin\PaymentRuleController;
 use App\Http\Controllers\Admin\ProjectController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\DiaryProductController;
+use App\Http\Controllers\Admin\LabourController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -106,6 +109,30 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('projects', ProjectController::class)->only(['index', 'show']);
 
+    Route::get('clients/data', [ClientController::class, 'getData'])
+        ->name('clients.data');
+
+    Route::resource('clients', ClientController::class);
+
+    Route::get('diary-products/data', [DiaryProductController::class, 'getData'])
+        ->name('diary-products.data');
+
+    Route::patch('diary-products/{id}/toggle-status', [DiaryProductController::class, 'toggleStatus'])
+        ->name('diary-products.toggle-status');
+
+    Route::resource('diary-products', DiaryProductController::class);
+
+    Route::get('project/labour/data',         [LabourController::class, 'getData'])
+        ->name('admin.project.labour.data');
+
+    Route::get('project/labour/autocomplete', [LabourController::class, 'autocomplete'])
+        ->name('admin.project.labour.autocomplete');
+
+    Route::get('project/labour/rate',         [LabourController::class, 'getRate'])
+        ->name('admin.project.labour.rate');
+
+    Route::resource('project/labour', LabourController::class)
+        ->names('admin.project.labour');
 
     // Route::get('/users/{id}/step2', [UserController::class, 'step2'])->name('users.step2');
     // Route::get('/users/{id}/step3', [UserController::class, 'step3'])->name('users.step3');

@@ -89,6 +89,12 @@ class PaymentRuleController extends Controller
 
     public function store(Request $request)
     {
+        $request->merge([
+            'payment_date' => formatToDbDate($request->payment_date),
+            'end_date'     => formatToDbDate($request->end_date),
+        ]);
+
+
         $validated = $request->validate(
             $this->validationRules(false),
             $this->validationMessages()
@@ -141,6 +147,12 @@ class PaymentRuleController extends Controller
     public function update(Request $request, $id)
     {
         $paymentRule = PaymentRule::findOrFail($id);
+
+        $request->merge([
+            'payment_date' => formatToDbDate($request->payment_date),
+            'end_date'     => formatToDbDate($request->end_date),
+        ]);
+
 
         $validated = $request->validate(
             $this->validationRules(true),

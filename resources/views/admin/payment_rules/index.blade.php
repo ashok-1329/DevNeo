@@ -12,7 +12,7 @@
         <div class="row g-2 align-items-end">
             <div class="col-auto">
                 <label class="form-label fw-semibold small mb-1 text-light">SUPPLIER</label>
-                <select id="filterSupplier" class="form-select form-select-sm" style="min-width:180px">
+                <select id="filterSupplier" class="form-control" style="min-width:180px">
                     <option value="">All Suppliers</option>
                     @foreach ($suppliers as $s)
                         <option value="{{ $s->supplier_name }}">{{ $s->supplier_name }}</option>
@@ -21,7 +21,7 @@
             </div>
             <div class="col-auto">
                 <label class="form-label fw-semibold small mb-1 text-light">FREQUENCY</label>
-                <select id="filterFrequency" class="form-select form-select-sm" style="min-width:160px">
+                <select id="filterFrequency" class="form-control" style="min-width:160px">
                     <option value="">All Frequencies</option>
                     @foreach ($frequencyPayments as $fp)
                         <option value="{{ $fp->name }}">{{ $fp->name }}</option>
@@ -30,7 +30,7 @@
             </div>
             <div class="col-auto">
                 <label class="form-label fw-semibold small mb-1 text-light">STATUS</label>
-                <select id="filterStatus" class="form-select form-select-sm" style="min-width:130px">
+                <select id="filterStatus" class="form-control" style="min-width:130px">
                     <option value="">All</option>
                     <option value="Active">Active</option>
                     <option value="Inactive">Inactive</option>
@@ -46,6 +46,8 @@
                 <button id="btnClearFilter" class="btn btn-success btn-sm">
                     <i class="fa fa-filter me-1"></i> Clear Filter
                 </button>
+
+                
             </div>
         </div>
     </div>
@@ -58,13 +60,13 @@
                 <thead>
                     <tr>
                         <th>SUPPLIER</th>
-                        <th>PAYMENT DATE</th>
-                        <th>FREQUENCY</th>
-                        <th>END DATE</th>
-                        <th>VALUE (INC. GST)</th>
                         <th>PROJECT NUMBER</th>
-                        <th>PROJECT CODE</th>
+                        <th>PAYMENT DATE</th>
+                        <th>END DATE</th>
+                        <th>FREQUENCY</th>
                         <th>STATUS</th>
+                        {{-- <th>VALUE (INC. GST)</th>
+                        <th>PROJECT CODE</th> --}}
                         <th>ACTION</th>
                     </tr>
                 </thead>
@@ -74,21 +76,6 @@
 
 </div>
 @endsection
-
-@push('styles')
-<style>
-    .pr-page-header {
-        background: var(--bs-secondary, #6c757d);
-        color: #fff;
-        padding: 1rem 1.25rem;
-        border-radius: 0.375rem;
-    }
-    .ls-1 { letter-spacing: .05em; }
-    #paymentRulesTable th { white-space: nowrap; font-size: 0.78rem; }
-    #paymentRulesTable td { vertical-align: middle; font-size: 0.82rem; }
-    .action-btn { padding: 3px 7px; font-size: 0.75rem; }
-</style>
-@endpush
 
 <script>
     const paymentRulesDataUrl = "{{ route('payment-rules.data') }}";
