@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\DiaryProductCategorie;
+use App\Models\DiaryProductCategory;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -53,7 +53,7 @@ class CategorySeeder extends Seeder
         ];
 
         foreach ($data as $item) {
-            DiaryProductCategorie::create($item);
+            DiaryProductCategory::create($item);
         }
     }
 }

@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\DiaryProduct;
-use App\Models\DiaryProductCategorie;
+use App\Models\DiaryProductCategory;
 use Illuminate\Http\Request;
 
 class DiaryProductController extends Controller
@@ -53,7 +53,7 @@ class DiaryProductController extends Controller
 
     public function create()
     {
-        $categories = DiaryProductCategorie::orderBy('name')->get();
+        $categories = DiaryProductCategory::orderBy('name')->get();
         return view('admin.diary-products.create', compact('categories'));
     }
 
@@ -82,7 +82,7 @@ class DiaryProductController extends Controller
     public function edit($id)
     {
         $product    = DiaryProduct::findOrFail($id);
-        $categories = DiaryProductCategorie::orderBy('name')->get();
+        $categories = DiaryProductCategory::orderBy('name')->get();
         return view('admin.diary-products.edit', compact('product', 'categories'));
     }
 

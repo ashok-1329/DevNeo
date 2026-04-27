@@ -224,7 +224,7 @@
                     {{-- <div class="col-md-4">
                         <label class="form-label fw-semibold small text-uppercase">Payment Days</label>
 
-                        <input type="text" id="paymentTermDaysDisplay" class="form-control form-control-sm"
+                        <input type="text" id="paymentTermDaysDisplay" class="form-control"
                             placeholder="Auto-filled on selection" readonly tabindex="-1"
                             value="{{ $supplier->payment_term_days ? $supplier->payment_term_days . ' days' : '' }}">
                     </div> --}}

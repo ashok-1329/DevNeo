@@ -141,6 +141,21 @@
                                         <i class="fa fa-users me-2"></i> Manage Labour Register
                                     </a>
                                 </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('subcontractors.index') }}">
+                                        <i class="fa fa-users me-2"></i> Manage Subcontractor
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('materials.index') }}">
+                                        <i class="fa fa-users me-2"></i> Manage Material
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('dockets.index') }}">
+                                        <i class="fa fa-users me-2"></i> Manage Docket
+                                    </a>
+                                </li>
                             </ul>
                         </li>
 

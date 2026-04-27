@@ -9,7 +9,10 @@ use App\Http\Controllers\Admin\ProjectController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\DiaryProductController;
+use App\Http\Controllers\Admin\DocketController;
+use App\Http\Controllers\Admin\SubcontractorController;
 use App\Http\Controllers\Admin\LabourController;
+use App\Http\Controllers\Admin\MaterialController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -100,39 +103,54 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('payment-rules/data', [PaymentRuleController::class, 'getData'])
         ->name('payment-rules.data');
-
     Route::resource('payment-rules', PaymentRuleController::class);
 
-    // ── Projects (basic — expand as needed) ───────────────────────────────────────
     Route::get('projects/data', [ProjectController::class, 'getData'])
         ->name('projects.data');
-
     Route::resource('projects', ProjectController::class)->only(['index', 'show']);
 
     Route::get('clients/data', [ClientController::class, 'getData'])
         ->name('clients.data');
-
     Route::resource('clients', ClientController::class);
 
     Route::get('diary-products/data', [DiaryProductController::class, 'getData'])
         ->name('diary-products.data');
-
     Route::patch('diary-products/{id}/toggle-status', [DiaryProductController::class, 'toggleStatus'])
         ->name('diary-products.toggle-status');
-
     Route::resource('diary-products', DiaryProductController::class);
 
     Route::get('project/labour/data',         [LabourController::class, 'getData'])
         ->name('admin.project.labour.data');
-
     Route::get('project/labour/autocomplete', [LabourController::class, 'autocomplete'])
         ->name('admin.project.labour.autocomplete');
-
     Route::get('project/labour/rate',         [LabourController::class, 'getRate'])
         ->name('admin.project.labour.rate');
-
     Route::resource('project/labour', LabourController::class)
         ->names('admin.project.labour');
+
+    Route::get('subcontractors/data', [SubcontractorController::class, 'getData'])
+        ->name('subcontractors.data');
+    Route::resource('subcontractors', SubcontractorController::class);
+
+    Route::get('materials/data', [MaterialController::class, 'getData'])
+        ->name('materials.data');
+    Route::get('materials/products-by-category/{categoryId}', [MaterialController::class, 'productsByCategory'])
+        ->name('materials.productsByCategory');
+    Route::post('materials/{id}/status', [MaterialController::class, 'statusUpdate'])
+        ->name('materials.statusUpdate');
+    Route::resource('materials', MaterialController::class);
+
+
+    Route::prefix('dockets')->group(function () {
+        Route::get('/', [DocketController::class, 'index'])->name('dockets.index');
+        Route::get('/data', [DocketController::class, 'getData'])->name('dockets.data');
+        Route::get('/create', [DocketController::class, 'create'])->name('dockets.create');
+        Route::post('/', [DocketController::class, 'store'])->name('dockets.store');
+        Route::get('/{id}', [DocketController::class, 'show'])->name('dockets.show');
+        Route::get('/{id}/edit', [DocketController::class, 'edit'])->name('dockets.edit');
+        Route::put('/{id}', [DocketController::class, 'update'])->name('dockets.update');
+        Route::delete('/{id}', [DocketController::class, 'destroy'])->name('dockets.destroy');
+    });
 
     // Route::get('/users/{id}/step2', [UserController::class, 'step2'])->name('users.step2');
     // Route::get('/users/{id}/step3', [UserController::class, 'step3'])->name('users.step3');

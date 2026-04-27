@@ -15,6 +15,6 @@ class DiaryProduct extends Model
 
     public function category()
     {
-        return $this->belongsTo(DiaryProductCategorie::class);
+        return $this->belongsTo(DiaryProductCategory::class);
     }
 }
