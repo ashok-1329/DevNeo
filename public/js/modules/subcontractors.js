@@ -39,7 +39,7 @@ function _initTable() {
     ajax: { url: dsDataUrl, dataSrc: "" },
     scrollX: true,
     dom: '<"d-flex justify-content-between align-items-center mb-2"lf>rtip',
-    order: [[0, "asc"]],
+    order: [[0, "desc"]], // newest first
     columns: [
       { data: "business_name", defaultContent: "-" },
       { data: "rep_name", defaultContent: "-" },

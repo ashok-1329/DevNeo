@@ -32,7 +32,12 @@ $(document).ready(function () {
             return statusToggle(row.id, d);
           },
         },
-        { data: "created_at", defaultContent: "-", title: "Created" },
+        {
+          data: "created_at",
+          title: "Created",
+          defaultContent: "-",
+          render: (d) => formatDate(d),
+        },
         {
           data: "id",
           title: "Action",
@@ -55,6 +60,7 @@ $(document).ready(function () {
           `,
         },
       ],
+      order: [[0, "desc"]], // newest first
 
       language: {
         search: "",

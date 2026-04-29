@@ -8,6 +8,7 @@ $(document).ready(function () {
     ajax: { url: suppliersDataUrl, dataSrc: "" },
     scrollX: true,
     dom: '<"d-flex justify-content-between align-items-center mb-2"lf>rtip',
+    order: [[0, "desc"]], // newest first
     columns: [
       {
         data: "category",

@@ -8,9 +8,9 @@
             <h4 class="text-light mb-0 text-uppercase">Edit Docket</h4>
 
             <div>
-                <a href="{{ route('dockets.show', $docket->id) }}" class="btn btn-info btn-sm text-white">
+                {{-- <a href="{{ route('dockets.show', $docket->id) }}" class="btn btn-info btn-sm text-white">
                     <i class="fa fa-eye me-1"></i> View
-                </a>
+                </a> --}}
 
                 <a href="{{ route('dockets.index') }}" class="btn btn-success btn-sm">
                     <i class="fa fa-arrow-left me-1"></i> Back
@@ -67,7 +67,7 @@
                         @foreach ($suppliers as $sup)
                             <option value="{{ $sup->id }}"
                                 {{ old('supplier', $docket->supplier) == $sup->id ? 'selected' : '' }}>
-                                {{ $sup->name }}
+                                {{ $sup->supplier_name }}
                             </option>
                         @endforeach
                     </select>
@@ -122,7 +122,7 @@
                         @foreach ($subcontractors as $sc)
                             <option value="{{ $sc->id }}"
                                 {{ old('sub_contractor', $docket->sub_contractor) == $sc->id ? 'selected' : '' }}>
-                                {{ $sc->name }}
+                                {{ $sc->business_name }}
                             </option>
                         @endforeach
                     </select>

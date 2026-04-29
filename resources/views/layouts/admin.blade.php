@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <title>Neo Admin</title>
 
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -115,9 +116,17 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('users.index') }}">
+                            <a class="nav-link dropdown-toggle" href="#" id="registerDropdown" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="fa fa-users-gear me-1"></i> Admin
                             </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('admin.project.configuration.index') }}">
+                                        <i class="fa fa-users me-2"></i> Manage Projects
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
 
                         <li class="nav-item">
@@ -126,6 +135,11 @@
                                 <i class="fa fa-diagram-project me-1"></i> Projects
                             </a>
                             <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('projects.index') }}">
+                                        <i class="fa fa-users me-2"></i> Manage Projects
+                                    </a>
+                                </li>
                                 <li>
                                     <a class="dropdown-item" href="{{ route('clients.index') }}">
                                         <i class="fa fa-users me-2"></i> Manage Clients

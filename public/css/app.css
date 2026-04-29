@@ -36,20 +36,6 @@ span.danger {
   border-color: var(--primary-dark) !important;
 }
 
-.custom-toast {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  color: #fff;
-  padding: 12px 18px;
-  border-radius: 5px;
-  z-index: 9999;
-  min-width: 250px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
 input:focus,
 select:focus,
 textarea:focus {
@@ -246,7 +232,7 @@ a {
 
 .custom-toast {
   position: fixed;
-  top: 20px;
+  top: 60px;
   right: 20px;
   background: var(--primary-color);
   color: white;
@@ -289,18 +275,10 @@ ul.dropdown-menu.show {
   left: auto;
 }
 
-.navbar {
-  /* background-color: rgb(124 156 63) !important; */
-}
-
 .navbar .nav-link {
   /* color: #fff !important; */
   font-weight: 500;
 }
-
-/* .navbar .nav-link:hover {
-    color: #e6e6e6 !important;
-} */
 
 .dropdown-menu {
   border-radius: 8px;
@@ -315,17 +293,6 @@ table {
   border: 1px solid #d1d3e0;
 }
 
-/* Column-wise striping */
-/* table tbody td:nth-child(even),
-table thead th:nth-child(even) {
-    background-color: #f5f5f5;
-}
-
-table tbody td:nth-child(odd),
-table thead th:nth-child(odd) {
-    background-color: #ffffff;
-} */
-
 .show-doc-img {
   max-width: 360px !important;
   max-height: 220px;
@@ -339,22 +306,121 @@ table thead th:nth-child(odd) {
   flex-wrap: wrap;
   gap: 20px;
 }
-.form-fieldsclient{
+.form-fieldsclient {
   width: 67.5%;
 }
-.form-imageclient{
+.form-imageclient {
   width: 27.5%;
 }
 
 .custom-switch:checked {
-    background-color: #28a745; /* your color */
-    border-color: #28a745;
+  background-color: #28a745; /* your color */
+  border-color: #28a745;
 }
 
 .custom-switch:focus {
-    box-shadow: none;
+  box-shadow: none;
 }
 
-table thead tr th{
+table thead tr th {
   text-transform: uppercase;
+  text-wrap: nowrap;
+}
+
+.profiletabs-link {
+  color: rgb(110, 141, 54) !important;
+}
+.profiletabs-link.nav-link.active {
+  color: rgb(0, 0, 0) !important;
+}
+
+.step-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: auto; /* keeps cursor visible */
+}
+
+.custom-radio-option {
+  position: relative;
+}
+
+.custom-radio-option input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.option-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  user-select: none;
+}
+
+.option-label:hover {
+  border-color: #198754;
+  background: #f8fff9;
+}
+
+.option-label .check-circle {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #adb5bd;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.option-label .check-icon {
+  font-size: 14px;
+  color: white;
+  opacity: 0;
+  transform: scale(0);
+  transition: all 0.25s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+/* Checked State with Animation */
+.custom-radio-option input:checked + .option-label {
+  border-color: #198754;
+  background: #f8fff9;
+  /* box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.15); */
+}
+
+.custom-radio-option input:checked + .option-label .check-circle {
+  background-color: #198754;
+  border-color: #198754;
+  transform: scale(1.1);
+}
+
+.custom-radio-option input:checked + .option-label .check-icon {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Extra smooth animation when switching */
+.custom-radio-option input:not(:checked) + .option-label .check-circle {
+  transform: scale(1);
+}
+
+.nav.flex-column.nav-pills.p-3 a {
+  color: black;
+}
+.nav.flex-column.nav-pills.p-3 a.active {
+  background: rgb(110, 141, 54);
+  color: white;
+}
+
+label{
+  text-transform: uppercase !important;
 }

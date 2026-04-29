@@ -168,7 +168,10 @@
         { data: "supplier" },
         { data: "job_code" },
         { data: "category" },
-        { data: "date" },
+        {
+          data: "date",
+          render: (d) => formatDate(d),
+        },
         {
           data: "status",
           render: (d) =>
@@ -192,6 +195,7 @@
           `,
         },
       ],
+      order: [[0, "desc"]], // newest first
     });
 
     /* DELETE */

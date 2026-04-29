@@ -11,7 +11,7 @@ $(document).ready(function () {
     ajax: { url: paymentRulesDataUrl, dataSrc: "" },
     scrollX: true,
     dom: '<"d-flex justify-content-between align-items-center mb-2"lf>rtip',
-    order: [[1, "desc"]],
+    order: [[0, "desc"]],
     columns: [
       {
         data: null,
@@ -62,6 +62,7 @@ $(document).ready(function () {
         `,
       },
     ],
+
   });
 
   $("#filterSupplier").on("change", function () {
@@ -141,33 +142,3 @@ $(document).ready(function () {
     });
   });
 });
-
-// function showToast(msg, type = "success") {
-//   const id = "toast_" + Date.now();
-//   const html = `
-//     <div id="${id}"
-//          class="toast align-items-center text-white bg-${type} border-0 position-fixed bottom-0 end-0 m-3"
-//          role="alert" style="z-index:9999">
-//       <div class="d-flex">
-//         <div class="toast-body">${msg}</div>
-//         <button type="button" class="btn-close btn-close-white me-2 m-auto"
-//                 data-bs-dismiss="toast"></button>
-//       </div>
-//     </div>`;
-//   $("body").append(html);
-//   const el = document.getElementById(id);
-//   new bootstrap.Toast(el, { delay: 3000 }).show();
-//   el.addEventListener("hidden.bs.toast", () => el.remove());
-// }
-
-function formatDate(d) {
-  if (!d) return "-";
-
-  const date = new Date(d);
-
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const year = date.getFullYear();
-
-  return `${day}/${month}/${year}`;
-}

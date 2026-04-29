@@ -212,6 +212,7 @@
           `,
         },
       ],
+      order: [[0, "desc"]], // newest first
     });
 
     /* DELETE */

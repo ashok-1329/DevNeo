@@ -13,6 +13,15 @@ use App\Http\Controllers\Admin\DocketController;
 use App\Http\Controllers\Admin\SubcontractorController;
 use App\Http\Controllers\Admin\LabourController;
 use App\Http\Controllers\Admin\MaterialController;
+use App\Http\Controllers\Admin\Configuration\ProjectConfigurationController;
+use App\Http\Controllers\Admin\Configuration\ContractTypeController;
+use App\Http\Controllers\Admin\Configuration\PaymentTermController;
+use App\Http\Controllers\Admin\Configuration\ProjectCodeCategoryController;
+use App\Http\Controllers\Admin\Configuration\PlantTypeController;
+use App\Http\Controllers\Admin\Configuration\PlantCapacityController;
+use App\Http\Controllers\Admin\Configuration\ProjectRegionController;
+
+
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -24,13 +33,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/dashboard', [DashboardController::class, 'index'])
         ->name('admin.dashboard');
 
-    Route::resource('users', UserController::class);
-
     // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
 
     Route::get('/projects', function () {
         return "Projects Module";
@@ -51,12 +57,33 @@ Route::middleware(['auth'])->group(function () {
         ->name('change.password.update');
 
 
-    Route::get('/users-data', [UserController::class, 'getUsers'])
-        ->name('users.data');
-    Route::resource('users', UserController::class);
+    // Route::get('/users-data', [UserController::class, 'getUsers'])
+    //     ->name('users.data');
+    // Route::resource('users', UserController::class);
 
-    Route::post('/user-step', [UserController::class, 'handleStep'])
-        ->name('users.step');
+    // Route::post('/user-step', [UserController::class, 'handleStep'])
+    //     ->name('users.step');
+
+
+    Route::prefix('users')->name('users.')->group(function () {
+
+        Route::get('{id}/full', [UserController::class, 'getUserFullData']);
+
+        // ✅ CUSTOM ROUTES FIRST (VERY IMPORTANT)
+        Route::get('data', [UserController::class, 'getUsers'])->name('data');
+
+        Route::post('step', [UserController::class, 'handleStep'])->name('step');
+        Route::post('upload', [UserController::class, 'uploadFile'])->name('upload');
+        // CERT ROUTES
+        Route::get('cert/{certId}/get', [UserController::class, 'getCert'])->name('cert.get');
+        Route::post('cert/{certId}/update', [UserController::class, 'updateCert'])->name('cert.update');
+        Route::delete('cert/{certId}', [UserController::class, 'deleteCert'])->name('cert.delete');
+
+        // ✅ RESOURCE ROUTES (CLEAN)
+        Route::resource('/', UserController::class)->parameters([
+            '' => 'id'
+        ])->except(['store', 'update']);
+    });
 
     Route::prefix('suppliers')->name('suppliers.')->group(function () {
 
@@ -105,8 +132,9 @@ Route::middleware(['auth'])->group(function () {
         ->name('payment-rules.data');
     Route::resource('payment-rules', PaymentRuleController::class);
 
-    Route::get('projects/data', [ProjectController::class, 'getData'])
-        ->name('projects.data');
+    Route::get('projects/data', [ProjectController::class, 'getData'])->name('projects.data');
+    Route::post('projects/step',         [ProjectController::class, 'handleStep'])->name('projects.step');
+    Route::post('projects/{id}/update-status', [ProjectController::class, 'updateStatus'])->name('projects.updateStatus');
     Route::resource('projects', ProjectController::class)->only(['index', 'show']);
 
     Route::get('clients/data', [ClientController::class, 'getData'])
@@ -150,6 +178,42 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id}/edit', [DocketController::class, 'edit'])->name('dockets.edit');
         Route::put('/{id}', [DocketController::class, 'update'])->name('dockets.update');
         Route::delete('/{id}', [DocketController::class, 'destroy'])->name('dockets.destroy');
+    });
+
+    Route::prefix('configuration')->name('admin.project.configuration.')->group(function () {
+
+        // Main index page
+        Route::get('/', [ProjectConfigurationController::class, 'index'])->name('index');
+
+        // Contract Types  (Setting model, type = 1)
+        Route::resource('contract-types', ContractTypeController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->parameters(['contract-types' => 'contractType']);
+
+        // Payment Terms
+        Route::resource('payment-terms', PaymentTermController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->parameters(['payment-terms' => 'paymentTerm']);
+
+        // Project Code Categories
+        Route::resource('code-categories', ProjectCodeCategoryController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->parameters(['code-categories' => 'codeCategory']);
+
+        // Plant Types
+        Route::resource('plant-types', PlantTypeController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->parameters(['plant-types' => 'plantType']);
+
+        // Plant Capacities
+        Route::resource('plant-capacities', PlantCapacityController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->parameters(['plant-capacities' => 'plantCapacity']);
+
+        // Project Regions
+        Route::resource('project-regions', ProjectRegionController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->parameters(['project-regions' => 'projectRegion']);
     });
 
     // Route::get('/users/{id}/step2', [UserController::class, 'step2'])->name('users.step2');

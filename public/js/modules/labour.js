@@ -56,6 +56,7 @@ $(document).ready(function () {
           `,
         },
       ],
+      order: [[0, "desc"]], // newest first
 
       language: {
         search:            "",

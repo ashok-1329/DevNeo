@@ -8,9 +8,9 @@
             <h4 class="text-light mb-0 text-uppercase">Docket Detail</h4>
 
             <div>
-                <a href="{{ route('dockets.edit', $docket->id) }}" class="btn btn-warning btn-sm text-white">
+                {{-- <a href="{{ route('dockets.edit', $docket->id) }}" class="btn btn-warning btn-sm text-white">
                     <i class="fa fa-pencil me-1"></i> Edit
-                </a>
+                </a> --}}
 
                 <a href="{{ route('dockets.index') }}" class="btn btn-success btn-sm">
                     <i class="fa fa-arrow-left me-1"></i> Back
