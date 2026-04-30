@@ -28,6 +28,7 @@ class Project extends Model
         'contract_admin',
         'construction_manager',
         'supervisor',
+        'contract_notes',
         'contractor_type',
         'superintendent',
         'contract_type',

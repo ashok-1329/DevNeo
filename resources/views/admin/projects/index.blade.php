@@ -12,7 +12,9 @@
                 <button id="btnExport" class="btn btn-success btn-sm">
                     <i class="fa fa-download"></i> Export Data
                 </button>
-
+                <a href="{{ route('projects.create') }}" class="btn btn-success btn-sm">
+                    Create Project
+                </a>
                 {{-- <button id="btnClearFilter" class="btn btn-secondary btn-sm">
                     Clear
                 </button> --}}
@@ -48,11 +50,9 @@
 @endsection
 
 <script>
-    
     const projectDataUrl = "{{ route('projects.data') }}";
     const projectBaseUrl = "{{ url('projects') }}";
     const csrfToken = "{{ csrf_token() }}";
-    
 </script>
 
 @push('scripts')

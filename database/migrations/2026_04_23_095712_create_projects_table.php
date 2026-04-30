@@ -21,6 +21,7 @@ return new class extends Migration
             $table->longText('project_description')->nullable();
             $table->longText('project_address')->nullable();
             $table->text('project_notes')->nullable();
+            $table->text('contract_notes')->nullable();
 
             // Client info
             $table->unsignedBigInteger('client_id')->nullable();

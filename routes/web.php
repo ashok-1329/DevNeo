@@ -132,13 +132,22 @@ Route::middleware(['auth'])->group(function () {
         ->name('payment-rules.data');
     Route::resource('payment-rules', PaymentRuleController::class);
 
+
+    // here all project routes
+
     Route::get('projects/data', [ProjectController::class, 'getData'])->name('projects.data');
     Route::post('projects/step',         [ProjectController::class, 'handleStep'])->name('projects.step');
     Route::post('projects/{id}/update-status', [ProjectController::class, 'updateStatus'])->name('projects.updateStatus');
-    Route::resource('projects', ProjectController::class)->only(['index', 'show']);
+    Route::get('/project/generate-number', [ProjectController::class, 'generateProjectNumber'])->name('project.generateNumber');
+    Route::resource('projects', ProjectController::class);
+
+
 
     Route::get('clients/data', [ClientController::class, 'getData'])
         ->name('clients.data');
+    Route::get('clients/getclient/{id}', [ClientController::class, 'getClient'])
+        ->name('clients.getClient');
+
     Route::resource('clients', ClientController::class);
 
     Route::get('diary-products/data', [DiaryProductController::class, 'getData'])

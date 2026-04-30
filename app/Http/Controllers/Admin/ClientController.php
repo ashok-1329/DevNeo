@@ -127,6 +127,13 @@ class ClientController extends Controller
         return view('admin.clients.show', compact('client'));
     }
 
+    public function getClient($id)
+    {
+        $client = Client::findOrFail($id);
+
+        return response()->json($client);
+    }
+
     // ──────────────────────────────────────────────────────────────────────────
     // EDIT
     // ──────────────────────────────────────────────────────────────────────────
