@@ -13,9 +13,6 @@ use Illuminate\Support\Facades\Auth;
 
 class MaterialController extends Controller
 {
-    /* ───────────────────────────────────────────── */
-    /* VIEW DATA                                     */
-    /* ───────────────────────────────────────────── */
     private function viewData(): array
     {
         return [
@@ -26,9 +23,6 @@ class MaterialController extends Controller
         ];
     }
 
-    /* ───────────────────────────────────────────── */
-    /* VALIDATION                                    */
-    /* ───────────────────────────────────────────── */
     private function buildRules(): array
     {
         return [
@@ -57,17 +51,11 @@ class MaterialController extends Controller
         ];
     }
 
-    /* ───────────────────────────────────────────── */
-    /* INDEX                                         */
-    /* ───────────────────────────────────────────── */
     public function index()
     {
         return view('admin.materials.index');
     }
 
-    /* ───────────────────────────────────────────── */
-    /* DATATABLE                                     */
-    /* ───────────────────────────────────────────── */
     public function getData()
     {
         $records = ProjectMaterial::with(['category', 'supplier', 'unit'])
@@ -87,17 +75,11 @@ class MaterialController extends Controller
         return response()->json($records);
     }
 
-    /* ───────────────────────────────────────────── */
-    /* CREATE                                        */
-    /* ───────────────────────────────────────────── */
     public function create()
     {
         return view('admin.materials.create', $this->viewData());
     }
 
-    /* ───────────────────────────────────────────── */
-    /* STORE                                         */
-    /* ───────────────────────────────────────────── */
     public function store(Request $request)
     {
         $request->validate($this->buildRules(), $this->messages());
@@ -118,9 +100,6 @@ class MaterialController extends Controller
             ->with('success', 'Material added successfully.');
     }
 
-    /* ───────────────────────────────────────────── */
-    /* SHOW                                          */
-    /* ───────────────────────────────────────────── */
     public function show($id)
     {
         $material = ProjectMaterial::with(['category', 'supplier', 'unit'])
@@ -129,9 +108,6 @@ class MaterialController extends Controller
         return view('admin.materials.show', compact('material'));
     }
 
-    /* ───────────────────────────────────────────── */
-    /* EDIT                                          */
-    /* ───────────────────────────────────────────── */
     public function edit($id)
     {
         $material = ProjectMaterial::findOrFail($id);
@@ -142,9 +118,6 @@ class MaterialController extends Controller
         );
     }
 
-    /* ───────────────────────────────────────────── */
-    /* UPDATE                                        */
-    /* ───────────────────────────────────────────── */
     public function update(Request $request, $id)
     {
         $material = ProjectMaterial::findOrFail($id);
@@ -167,9 +140,6 @@ class MaterialController extends Controller
             ->with('success', 'Material updated successfully.');
     }
 
-    /* ───────────────────────────────────────────── */
-    /* DELETE                                        */
-    /* ───────────────────────────────────────────── */
     public function destroy($id)
     {
         ProjectMaterial::findOrFail($id)->delete();

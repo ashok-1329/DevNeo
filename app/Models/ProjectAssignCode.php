@@ -13,6 +13,7 @@ class ProjectAssignCode extends Model
         'project_id',
         'code_id',
         'assign_margin',
+        'description',
     ];
 
     protected $casts = [

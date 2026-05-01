@@ -7,7 +7,7 @@
 
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="mb-0">Create New User</h4>
-            <a href="{{ route('users.index') }}" class="btn btn-secondary">
+            <a href="{{ route('users.index') }}" class="btn btn-success">
                 <i class="fa fa-arrow-left me-1"></i> Back
             </a>
         </div>

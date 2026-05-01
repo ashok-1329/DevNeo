@@ -32,10 +32,6 @@
       .replace(/'/g, "&#039;");
   }
 
-  /* ================================================================
-     INDEX PAGE — DATATABLE
-  ================================================================ */
-
   function initProjectTable() {
     if (!window.$ || !$.fn.DataTable) return;
     if (!document.getElementById("projectsTable")) return;
@@ -244,6 +240,15 @@
       prefillStep3(existingProject);
       prefillStep4(existingProject);
       prefillStep5(existingProject);
+      prefillStep6(existingProject);
+      prefillStep7(existingProject);
+      prefillStep8(existingProject);
+      prefillStep9(existingProject);
+      prefillStep10(existingProject);
+      prefillStep11(existingProject);
+      prefillStep12(existingProject);
+      prefillStep13(existingProject);
+
       completedSteps.forEach((s) => markComplete(s));
     }
 
@@ -265,7 +270,7 @@
     $("#step10_next").on("click", () => nextStep(10));
     $("#step11_next").on("click", () => nextStep(11));
     $("#step12_next").on("click", () => nextStep(12));
-    // $("#step13_next").on("click", () => nextStep(13));
+    $("#step13_next").on("click", () => nextStep(13));
     $("#step13_finish").on("click", () => nextStep(13));
 
     $("#step2_prev").on("click", () => showStep(1));
@@ -312,6 +317,24 @@
             console.error("Error fetching client:", err);
           },
         });
+      });
+
+      $(
+        "#custom_practical_completion, #custom_final_completion, #custom_cash_practical_completion, #custom_cash_final_completion",
+      ).on("input", function () {
+        let val = parseFloat($(this).val());
+
+        if (val >= 100) {
+          $(this).val(0);
+        }
+      });
+
+      $(document).on("input", "input[name^='setupcode']", function () {
+        let val = parseFloat($(this).val());
+        if (isNaN(val)) return;
+        if (val >= 100) {
+          $(this).val(0);
+        }
       });
 
       $(document).on("change", "#project_region", function () {
@@ -371,28 +394,91 @@
           $("#bank_fields").removeClass("d-none");
         } else {
           $("#bank_fields").addClass("d-none");
-
-          // clear values
           $("#bank_fields").find("input, select").val("");
         }
       });
 
+      // custom toggles
       $("#practical_completion").on("change", function () {
-        if ($(this).val() === "custom") {
-          $("#custom_practical_wrap").removeClass("d-none");
-        } else {
-          $("#custom_practical_wrap").addClass("d-none");
-          $("#custom_practical_completion").val("");
-        }
+        $("#custom_practical_wrap").toggleClass(
+          "d-none",
+          $(this).val() !== "custom",
+        );
+        calculateCompletionAmounts();
       });
 
       $("#final_completion").on("change", function () {
-        if ($(this).val() === "custom") {
-          $("#custom_final_wrap").removeClass("d-none");
+        $("#custom_final_wrap").toggleClass(
+          "d-none",
+          $(this).val() !== "custom",
+        );
+        calculateCompletionAmounts();
+      });
+
+      // live updates
+      $("#custom_practical_completion, #custom_final_completion").on(
+        "input",
+        calculateCompletionAmounts,
+      );
+
+      // 🔥 IMPORTANT: also recalc if contract value changes (step 5 dependency)
+      $("#contract_value_gst").on("input change", calculateCompletionAmounts);
+
+      // toggle
+      $('input[name="cash_retentions_required"]').on("change", function () {
+        const val = $(this).val();
+
+        if (val == "1") {
+          $("#cash_fields").removeClass("d-none");
         } else {
-          $("#custom_final_wrap").addClass("d-none");
-          $("#custom_final_completion").val("");
+          $("#cash_fields").addClass("d-none");
+          $("#cash_fields").find("input, select").val("");
         }
+      });
+
+      // custom toggle
+      $("#cash_practical_completion").on("change", function () {
+        $("#custom_cash_practical_wrap").toggleClass(
+          "d-none",
+          $(this).val() !== "custom",
+        );
+        calculateCashRetention;
+      });
+
+      $("#cash_final_completion").on("change", function () {
+        $("#custom_cash_final_wrap").toggleClass(
+          "d-none",
+          $(this).val() !== "custom",
+        );
+        calculateCashRetention;
+      });
+
+      // live input
+      $("#custom_cash_practical_completion, #custom_cash_final_completion").on(
+        "input",
+        calculateCashRetention,
+      );
+
+      // 🔥 dependent on step 5
+      $("#contract_value_gst").on("input change", calculateCashRetention);
+
+      $(document).on("change", ".resource-checkbox", function () {
+        const el = $(this);
+
+        $.ajax({
+          url: toggleResourceUrl,
+          method: "POST",
+          headers: { "X-CSRF-TOKEN": csrfToken },
+          data: {
+            project_id: projectId,
+            record_id: el.data("id"),
+            type: el.data("type"),
+            checked: el.is(":checked") ? 1 : 0,
+          },
+          error: function () {
+            showToast("Something went wrong", "danger");
+          },
+        });
       });
     });
 
@@ -401,7 +487,6 @@
       return parseFloat(val) || 0;
     }
 
-    // 👉 Main calculation function (single source of truth)
     function calculateFinancials() {
       const contractInc = toNum($("#contract_value").val());
       const provisionalInc = toNum($("#provisional_sum_total").val());
@@ -432,9 +517,6 @@
       $("#profit_value").val(profitValue.toFixed(2));
     }
 
-    /* ==============================================================
-       SHOW STEP
-    ============================================================== */
     function showStep(n) {
       $(".step-panel").addClass("d-none");
       $("#step" + n).removeClass("d-none");
@@ -444,9 +526,6 @@
       );
     }
 
-    /* ==============================================================
-       NEXT STEP  — validate → AJAX save → advance
-    ============================================================== */
     function nextStep(step) {
       if (!validateStep(step)) return;
 
@@ -618,6 +697,90 @@
         }
       }
 
+      if (step === 7) {
+        const isYes = $('input[name="cash_retentions_required"]:checked').val();
+
+        fd.append("cash_retentions_required", isYes ?? "");
+
+        if (isYes === "1") {
+          fd.append(
+            "cash_practical_completion",
+            $("#cash_practical_completion").val(),
+          );
+          fd.append(
+            "custom_cash_practical_completion",
+            $("#custom_cash_practical_completion").val(),
+          );
+          fd.append(
+            "cash_practical_completion_amount",
+            $("#cash_practical_completion_amount").val(),
+          );
+
+          fd.append("cash_final_completion", $("#cash_final_completion").val());
+          fd.append(
+            "custom_cash_final_completion",
+            $("#custom_cash_final_completion").val(),
+          );
+          fd.append(
+            "cash_final_completion_amount",
+            $("#cash_final_completion_amount").val(),
+          );
+        }
+      }
+
+      if (step === 8) {
+        const fileInput = document.querySelector(
+          'input[name="pricing_schedule"]',
+        );
+
+        if (fileInput && fileInput.files.length > 0) {
+          fd.append("pricing_schedule", fileInput.files[0]);
+        }
+
+        // assign margins
+        let margins = {};
+        $(".assign-margin").each(function () {
+          const id = $(this).data("id");
+          margins[id] = $(this).val();
+        });
+
+        fd.append("assign_margin", JSON.stringify(margins));
+      }
+
+      if (step === 9) {
+        let margins = {};
+        let descriptions = {};
+
+        $("input[name^='setupcode']").each(function () {
+          const id = $(this).attr("name").match(/\d+/)[0];
+          margins[id] = $(this).val();
+        });
+        $("input[name^='setupname']").each(function () {
+          const id = $(this).attr("name").match(/\d+/)[0];
+          descriptions[id] = $(this).val();
+        });
+
+        fd.append("assign_margin", JSON.stringify(margins));
+        fd.append("desc_name", JSON.stringify(descriptions));
+      }
+
+      if (step === 10) {
+        let codes = {};
+        let descriptions = {};
+
+        $(".code-select").each(function () {
+          const id = $(this).data("id");
+          codes[id] = $(this).val();
+        });
+
+        $("input[name^='item']").each(function () {
+          const id = $(this).attr("name").match(/\d+/)[0];
+          descriptions[id] = $(this).val();
+        });
+        fd.append("codes", JSON.stringify(codes));
+        fd.append("descriptions", JSON.stringify(descriptions));
+      }
+
       return fd;
     }
 
@@ -701,13 +864,540 @@
       $("#profit_value").val(d.profit_value);
     }
 
+    function prefillStep6(d) {
+      if (!d) return;
+
+      if (
+        d.bank_guarantee_required !== null &&
+        d.bank_guarantee_required !== undefined
+      ) {
+        $(
+          'input[name="bank_guarantee_required"][value="' +
+            d.bank_guarantee_required +
+            '"]',
+        )
+          .prop("checked", true)
+          .trigger("change");
+      }
+
+      if (d.bank_guarantee_required) {
+        $("#bank_fields").removeClass("d-none");
+      }
+
+      if (d.practical_completion) {
+        $("#practical_completion")
+          .val(d.practical_completion)
+          .trigger("change");
+      }
+
+      if (d.custom_practical_completion) {
+        $("#custom_practical_completion").val(d.custom_practical_completion);
+        $("#custom_practical_wrap").removeClass("d-none"); // 🔥 force show
+      }
+
+      if (d.practical_completion_amount) {
+        $("#practical_completion_amount").val(d.practical_completion_amount);
+      }
+
+      if (d.final_completion) {
+        $("#final_completion").val(d.final_completion).trigger("change");
+      }
+
+      if (d.custom_final_completion) {
+        $("#custom_final_completion").val(d.custom_final_completion);
+        $("#custom_final_wrap").removeClass("d-none");
+      }
+
+      if (d.final_completion_amount) {
+        $("#final_completion_amount").val(d.final_completion_amount);
+      }
+
+      calculateCompletionAmounts();
+    }
+
+    function prefillStep7(d) {
+      if (!d) return;
+
+      if (
+        d.cash_retentions_required !== null &&
+        d.cash_retentions_required !== undefined
+      ) {
+        $(
+          'input[name="cash_retentions_required"][value="' +
+            d.cash_retentions_required +
+            '"]',
+        )
+          .prop("checked", true)
+          .trigger("change");
+      }
+      if (d.cash_retentions_required) {
+        $("#cash_fields").removeClass("d-none");
+      }
+
+      if (d.cash_practical_completion) {
+        $("#cash_practical_completion")
+          .val(d.cash_practical_completion)
+          .trigger("change");
+      }
+
+      if (d.custom_cash_practical_completion) {
+        $("#custom_cash_practical_completion").val(
+          d.custom_cash_practical_completion,
+        );
+        $("#custom_cash_practical_wrap").removeClass("d-none");
+      }
+
+      if (d.cash_practical_completion_amount) {
+        $("#cash_practical_completion_amount").val(
+          d.cash_practical_completion_amount,
+        );
+      }
+
+      // FINAL
+      if (d.cash_final_completion) {
+        $("#cash_final_completion")
+          .val(d.cash_final_completion)
+          .trigger("change");
+      }
+
+      if (d.custom_cash_final_completion) {
+        $("#custom_cash_final_completion").val(d.custom_cash_final_completion);
+        $("#custom_cash_final_wrap").removeClass("d-none");
+      }
+
+      if (d.cash_final_completion_amount) {
+        $("#cash_final_completion_amount").val(d.cash_final_completion_amount);
+      }
+
+      // ensure amounts are correct after load
+      calculateCashRetention;
+    }
+
+    function prefillStep8(d) {}
+
+    function prefillStep9(d) {
+      if (!d || !d.assign_codes) return;
+
+      const tbody = $("#step9 tbody");
+      tbody.empty();
+
+      d.assign_codes.forEach((row) => {
+        // find margin for this row's code
+        let assign = (d.assign_codes || []).find(
+          (c) => c.code_name == row.code_name,
+        );
+
+        let margin = assign ? assign.assign_margin : "";
+
+        tbody.append(`
+      <tr>
+        <td>${row.code_name || ""}</td>
+
+        <td>
+          <input type="text"
+            name="setupname[${row.id}]"
+            class="form-control desc"
+            data-id="${row.id}"
+            value="${row.name || ""}">
+        </td>
+          
+        <td>
+            <input type="number"
+              name="setupcode[${row.id}]"
+              class="form-control margin"
+              data-code="${row.assign_margin || ""}"
+              value="${margin}"
+              min="0" max="100">
+        </td>
+      </tr>
+    `);
+      });
+    }
+
+    function prefillStep10(d) {
+      if (!d || !d.pricing_schedules) return;
+
+      const table = $("#pricing_table tbody");
+      table.empty();
+
+      d.pricing_schedules.forEach((row, index) => {
+        table.append(`
+      <tr>
+        <td>${index + 1 || ""}</td>
+
+        <td>
+          <input type="text"
+            name="item[${row.id}]"
+            class="form-control"
+            data-id="${row.id}"
+            value="${row.item || ""}">
+        </td>
+
+        <td>${row.quantity || ""}</td>
+        <td>${row.unit || ""}</td>
+        <td>${row.rate || ""}</td>
+        <td>${row.amount || ""}</td>
+
+        <td>
+          <select class="form-select code-select"
+            data-id="${row.id}">
+            <option value="">Select</option>
+            ${assignCodes
+              .map(
+                (code) => `
+              <option value="${code.id}"
+                ${row.code_id == code.id ? "selected" : ""}>
+                ${code.code_id}
+              </option>
+            `,
+              )
+              .join("")}
+          </select>
+        </td>
+      </tr>
+    `);
+      });
+    }
+
+    function prefillStep11(d) {
+      const tableEl = document.getElementById("materialsTable");
+      if (!tableEl || typeof $.fn.DataTable === "undefined") return;
+
+      const table = $("#materialsTable").DataTable({
+        processing: true,
+        ajax: { url: matDataUrl, dataSrc: "" },
+
+        columns: [
+          { data: "id" },
+          { data: "category_name" },
+          { data: "item" },
+          { data: "supplier_name" },
+          { data: "unit_name" },
+          { data: "rate" },
+          {
+            data: "is_docket",
+            render: (d) =>
+              d === "Yes"
+                ? '<span class="badge bg-success">Yes</span>'
+                : '<span class="badge bg-secondary">No</span>',
+          },
+          {
+            data: "id",
+            render: (id) => `
+          <div class="form-check d-flex justify-content-center">
+            <input type="checkbox"
+              class="form-check-input resource-checkbox"
+              data-id="${id}"
+              data-type="material">
+          </div>
+        `,
+          },
+          {
+            data: "id",
+            orderable: false,
+            render: (id) => `
+          <a href="${matBaseUrl}/${id}" class="btn btn-sm btn-secondary">
+            <i class="fa fa-eye"></i>
+          </a>
+          <a href="${matBaseUrl}/${id}/edit" class="btn btn-sm btn-success ms-1">
+            <i class="fa fa-pencil"></i>
+          </a>
+          <button class="btn btn-sm btn-danger ms-1 btn-delete" data-id="${id}">
+            <i class="fa fa-trash"></i>
+          </button>
+        `,
+          },
+        ],
+
+        order: [[0, "desc"]],
+
+        drawCallback: function () {
+          const data = d.ProjectMaterialManage || [];
+
+          $(".resource-checkbox").each(function () {
+            const el = $(this);
+            const id = el.data("id");
+
+            const record = data.find((r) => r.record_id == id);
+
+            if (record) {
+              const periods = record.periods || [];
+
+              if (periods.length) {
+                const last = periods[periods.length - 1];
+                const active = last.to === null && last.status === "active";
+
+                el.prop("checked", active);
+              } else {
+                el.prop("checked", false);
+              }
+            } else {
+              el.prop("checked", false);
+            }
+          });
+        },
+      });
+    }
+
+    function prefillStep12(d) {
+      const tableEl = document.getElementById("plantTableProject");
+      if (!tableEl || typeof $.fn.DataTable === "undefined") return;
+
+      const table = $("#plantTableProject").DataTable({
+        processing: true,
+        destroy: true,
+
+        ajax: { url: plantDataUrl, dataSrc: "" },
+
+        columns: [
+          { data: "plant_code", defaultContent: "-" }, // Asset ID
+
+          {
+            data: "plant_type",
+            defaultContent: "-",
+            render: (d) => (d ? d : "-"), // you can map labels if needed
+          },
+
+          { data: "plant_capacity", defaultContent: "-" },
+
+          { data: "supplier", defaultContent: "-" },
+
+          {
+            data: "plant_name",
+            defaultContent: "-", // Plant Description
+          },
+
+          { data: "unit", defaultContent: "-" },
+
+          {
+            data: "rate",
+            defaultContent: "-",
+            render: (d) => (d ? `$${parseFloat(d).toLocaleString()}` : "-"),
+          },
+
+          {
+            data: "is_docket",
+            defaultContent: "-",
+            className: "text-center",
+            render: (d) =>
+              d == 1
+                ? '<span class="badge bg-success">Yes</span>'
+                : '<span class="badge bg-secondary">No</span>',
+          },
+          {
+            data: "id",
+            orderable: false,
+            searchable: false,
+            className: "text-center",
+            render: (id) => `
+          <div class="form-check d-flex justify-content-center">
+            <input type="checkbox" class="form-check-input btn-assign resource-checkbox" data-id="${id}" data-type="plant">
+          </div>
+        `,
+          },
+          {
+            data: "id",
+            orderable: false,
+            searchable: false,
+            className: "text-center",
+            render: (id) => `
+          <a href="${plantBaseUrl}/${id}" class="btn btn-sm btn-secondary">
+            <i class="fa fa-eye"></i>
+          </a>
+
+          <a href="${plantBaseUrl}/${id}/edit" class="btn btn-sm btn-success ms-1">
+            <i class="fa fa-edit"></i>
+          </a>
+
+          <button class="btn btn-sm btn-danger ms-1 btn-delete" data-id="${id}">
+            <i class="fa fa-trash"></i>
+          </button>
+        `,
+          },
+        ],
+
+        order: [[0, "desc"]],
+        drawCallback: function () {
+          const data = d.ProjectManagePlant || [];
+
+          $("#plantTableProject .resource-checkbox").each(function () {
+            const el = $(this);
+            const id = el.data("id");
+
+            const record = data.find((r) => r.plant_id == id);
+
+            if (record) {
+              el.prop("checked", isActive(record.periods));
+            } else {
+              el.prop("checked", false);
+            }
+          });
+        },
+
+        language: {
+          search: "",
+          searchPlaceholder: "Search plant…",
+          lengthMenu: "Show _MENU_ entries",
+          emptyTable: "No plant records found.",
+        },
+
+        initComplete: function () {
+          $("#plantTableProject_filter input")
+            .addClass("form-control")
+            .css("width", "260px");
+        },
+      });
+
+      // ── DELETE ─────────────────────────────
+      $("#plantTableProject").on("click", ".btn-delete", function () {
+        const id = $(this).data("id");
+
+        if (!confirm("Delete this plant record?")) return;
+
+        $.ajax({
+          url: `${plantBaseUrl}/${id}`,
+          type: "DELETE",
+          data: { _token: csrfToken },
+          success: () => {
+            table.ajax.reload(null, false);
+            showToast("Deleted successfully", "success");
+          },
+          error: () => showToast("Error occurred", "danger"),
+        });
+      });
+
+      $("#plantTableProject").on("change", ".btn-assign", function () {
+        const id = $(this).data("id");
+        const checked = $(this).is(":checked");
+
+        $.ajax({
+          url: `${plantBaseUrl}/${id}/assign`,
+          type: "POST",
+          data: {
+            _token: csrfToken,
+            assigned: checked ? 1 : 0,
+          },
+        });
+      });
+    }
+
+    function prefillStep13(d) {
+      const tableEl = document.getElementById("labourTableProject");
+      if (!tableEl || typeof $.fn.DataTable === "undefined") return;
+
+      const typeBadge = {
+        Internal: '<span class="badge bg-success">Internal</span>',
+        External: '<span class="badge bg-secondary">External</span>',
+      };
+
+      const table = $("#labourTableProject").DataTable({
+        processing: true,
+        destroy: true, // ✅ important (like safe reload)
+
+        ajax: { url: labourDataUrl, dataSrc: "" },
+
+        columns: [
+          { data: "name" },
+          { data: "employment_type" },
+          { data: "position" },
+          { data: "employer" },
+          { data: "region" },
+          { data: "rate" },
+          {
+            data: "id",
+            orderable: false,
+            searchable: false,
+            className: "text-center",
+            render: (id) => `
+          <div class="form-check d-flex justify-content-center">
+            <input type="checkbox" class="form-check-input btn-assign resource-checkbox" data-id="${id}" data-type="labour">
+          </div>
+        `,
+          },
+
+          // Action column
+          {
+            data: "id",
+            orderable: false,
+            searchable: false,
+            className: "text-center",
+            render: (id) => `
+          <a href="${labourBaseUrl}/${id}" class="btn btn-sm btn-secondary">
+            <i class="fa fa-eye"></i>
+          </a>
+
+          <a href="${labourBaseUrl}/${id}/edit" class="btn btn-sm btn-success ms-1">
+            <i class="fa fa-edit"></i>
+          </a>
+
+          <button class="btn btn-sm btn-danger ms-1 btn-delete" data-id="${id}">
+            <i class="fa fa-trash"></i>
+          </button>
+        `,
+          },
+        ],
+
+        order: [[0, "desc"]],
+        drawCallback: function () {
+          const data = d.ProjectManageLabour || [];
+
+          $("#labourTableProject .resource-checkbox").each(function () {
+            const el = $(this);
+            const id = el.data("id");
+
+            const record = data.find((r) => r.labour_id == id);
+
+            if (record) {
+              el.prop("checked", isActive(record.periods));
+            } else {
+              el.prop("checked", false);
+            }
+          });
+        },
+        language: {
+          search: "",
+          searchPlaceholder: "Search labour…",
+          lengthMenu: "Show _MENU_ entries",
+          processing:
+            '<div class="spinner-border spinner-border-sm text-secondary"></div>',
+          emptyTable: "No labour records found.",
+          zeroRecords: "No matching records found.",
+          info: "Showing _START_ to _END_ of _TOTAL_ records",
+          infoEmpty: "No records available",
+          infoFiltered: "(filtered from _MAX_ total)",
+        },
+
+        initComplete: function () {
+          $("#labourTableProject_filter input")
+            .addClass("form-control")
+            .css("width", "260px");
+        },
+      });
+
+      // ── DELETE ─────────────────────────────────────────────
+      $("#labourTableProject").on("click", ".btn-delete", function () {
+        const id = $(this).data("id");
+
+        if (!confirm("Are you sure you want to delete this labour record?"))
+          return;
+
+        $.ajax({
+          url: `${labourBaseUrl}/${id}`,
+          type: "DELETE",
+          data: { _token: csrfToken },
+          success: () => {
+            table.ajax.reload(null, false);
+            showToast("Labour deleted successfully.", "success");
+          },
+          error: () => showToast("Failed to delete labour.", "danger"),
+        });
+      });
+    }
+
     $("#client_phone_number").on("input", function () {
       this.value = this.value.replace(/[^0-9]/g, "");
     });
 
-    /* ==============================================================
-       VALIDATION
-    ============================================================== */
     function validateStep(step) {
       clearErrors();
       let ok = true;
@@ -835,6 +1525,141 @@
           ok = false;
       }
 
+      if (step === 6) {
+        const val = $('input[name="bank_guarantee_required"]:checked').val();
+
+        if (!val) {
+          alert("Please select Yes or No");
+          ok = false;
+        }
+
+        if (val == "1") {
+          if (!req($("#practical_completion"), "Required")) ok = false;
+          if (!req($("#final_completion"), "Required")) ok = false;
+
+          if (
+            $("#practical_completion").val() === "custom" &&
+            !req($("#custom_practical_completion"), "Required")
+          )
+            ok = false;
+
+          if (
+            $("#final_completion").val() === "custom" &&
+            !req($("#custom_final_completion"), "Required")
+          )
+            ok = false;
+        }
+      }
+
+      if (step === 7) {
+        let ok = true;
+
+        const val = $('input[name="cash_retentions_required"]:checked').val();
+
+        if (!val) {
+          showToast("Please select Yes or No", "warning");
+          return false;
+        }
+
+        if (val === "1") {
+          if (!req($("#cash_practical_completion"), "Required")) ok = false;
+          if (!req($("#cash_final_completion"), "Required")) ok = false;
+
+          // Practical custom
+          if ($("#cash_practical_completion").val() === "custom") {
+            const v = parseFloat($("#custom_cash_practical_completion").val());
+            if (!v && v !== 0) {
+              showErr($("#custom_cash_practical_completion"), "Required");
+              ok = false;
+            } else if (v < 0 || v > 100) {
+              showErr(
+                $("#custom_cash_practical_completion"),
+                "Must be between 0–100",
+              );
+              ok = false;
+            }
+          }
+
+          // Final custom
+          if ($("#cash_final_completion").val() === "custom") {
+            const v = parseFloat($("#custom_cash_final_completion").val());
+            if (!v && v !== 0) {
+              showErr($("#custom_cash_final_completion"), "Required");
+              ok = false;
+            } else if (v < 0 || v > 100) {
+              showErr(
+                $("#custom_cash_final_completion"),
+                "Must be between 0–100",
+              );
+              ok = false;
+            }
+          }
+        }
+
+        return ok;
+      }
+
+      if (step === 8) {
+        const file = $('input[name="pricing_schedule"]').val();
+
+        if (!file && !existingProject?.pricing_file) {
+          showToast("Please upload pricing schedule", "warning");
+          return false;
+        }
+
+        let valid = true;
+
+        $(".assign-margin").each(function () {
+          const val = parseFloat($(this).val());
+
+          if (isNaN(val) || val < 0 || val > 100) {
+            showErr($(this), "0–100 only");
+            valid = false;
+          }
+        });
+
+        return valid;
+      }
+
+      if (step === 9) {
+        let valid = true;
+
+        $("#step9 tbody tr").each(function () {
+          const marginInput = $(this).find(".margin");
+          const descInput = $(this).find(".desc");
+
+          const margin = parseFloat(marginInput.val());
+          const desc = descInput.val().trim();
+
+          // margin validation
+          if (isNaN(margin) || margin < 0 || margin > 100) {
+            showErr(marginInput, "0–100 only");
+            valid = false;
+          }
+
+          // description validation (optional but recommended)
+          if (!desc) {
+            showErr(descInput, "Required");
+            valid = false;
+          }
+        });
+
+        return valid;
+      }
+
+      if (step === 10) {
+        let valid = true;
+
+        $(".code-select").each(function () {
+          if (!$(this).val()) {
+            showErr($(this), "Required");
+            valid = false;
+          }
+        });
+
+        return valid;
+      }
+
       return ok;
     }
 
@@ -857,6 +1682,65 @@
         $el.after(`<div class="invalid-feedback">${msg}</div>`);
       }
     }
+  }
+
+  function isActive(periods) {
+    if (!periods || !periods.length) return false;
+    const last = periods[periods.length - 1];
+    return last && last.to === null && last.status === "active";
+  }
+
+  function getContractValueExGST() {
+    return parseFloat($("#contract_value").val()) || 0;
+  }
+
+  function calculateCompletionAmounts() {
+    const contractValue = getContractValueExGST();
+
+    let practicalPercent = $("#practical_completion").val();
+
+    if (practicalPercent === "custom") {
+      practicalPercent = $("#custom_practical_completion").val();
+    }
+
+    practicalPercent = parseFloat(practicalPercent) || 0;
+
+    const practicalAmount = (contractValue * practicalPercent) / 100;
+    $("#practical_completion_amount").val(practicalAmount.toFixed(2));
+
+    let finalPercent = $("#final_completion").val();
+
+    if (finalPercent === "custom") {
+      finalPercent = $("#custom_final_completion").val();
+    }
+
+    finalPercent = parseFloat(finalPercent) || 0;
+
+    const finalAmount = (contractValue * finalPercent) / 100;
+    $("#final_completion_amount").val(finalAmount.toFixed(2));
+  }
+
+  function calculateCashRetention() {
+    const contractValue = parseFloat($("#contract_value").val()) || 0;
+    let practical = $("#cash_practical_completion").val();
+    if (practical === "custom") {
+      practical = $("#custom_cash_practical_completion").val();
+    }
+
+    let final = $("#cash_final_completion").val();
+    if (final === "custom") {
+      final = $("#custom_cash_final_completion").val();
+    }
+
+    practical = parseFloat(practical) || 0;
+    final = parseFloat(final) || 0;
+
+    $("#cash_practical_completion_amount").val(
+      ((contractValue * practical) / 100).toFixed(2),
+    );
+    $("#cash_final_completion_amount").val(
+      ((contractValue * final) / 100).toFixed(2),
+    );
   }
 
   /* ================================================================

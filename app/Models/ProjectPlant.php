@@ -10,7 +10,6 @@ class ProjectPlant extends Model
     use HasFactory;
 
     protected $fillable = [
-        'project_id',
         'plant_id',
         'plant_type',
         'plant_capacity',
@@ -28,7 +27,6 @@ class ProjectPlant extends Model
     ];
 
     protected $casts = [
-        'project_id' => 'integer',
         'plant_type' => 'integer',
         'plant_capacity' => 'integer',
         'registration_expiry_date' => 'date',
@@ -40,5 +38,10 @@ class ProjectPlant extends Model
     public function project()
     {
         return $this->belongsTo(Project::class);
+    }
+
+    public function supplierCategory()
+    {
+        return $this->belongsTo(SupplierCategory::class, 'supplier');
     }
 }

@@ -15,11 +15,12 @@
 
     $acceptMap = [
         'image' => '.jpg,.jpeg,.png,.gif,.webp',
-        'document' => '.pdf,.doc,.docx,.jpg,.jpeg,.png',
+        'document' =>
+            '.pdf,.doc,.docx,.txt,.rtf,.odt,.xls,.xlsx,.csv,.ods,.ppt,.pptx,.odp,.jpg,.jpeg,.png,.gif,.bmp,.webp',
     ];
     $hintMap = [
         'image' => 'JPG, PNG, GIF, WEBP — max 10 MB',
-        'document' => 'PDF, Word, JPG, PNG — max 10 MB',
+        'document' => 'PDF, Word (DOC/DOCX), Excel (XLS/XLSX), PowerPoint (PPT/PPTX), Text (TXT/RTF), OpenDocument (ODT/ODS/ODP), CSV, JPG, JPEG, PNG, GIF, WEBP — max 10 MB'
     ];
     $accept = $acceptMap[$type] ?? $acceptMap['document'];
     $hint = $hintMap[$type] ?? $hintMap['document'];

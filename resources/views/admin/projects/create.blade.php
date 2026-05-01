@@ -17,59 +17,78 @@
             {{-- ══════════════════════════════════
              STEP NAVIGATION
         ══════════════════════════════════ --}}
+            @php
+                function canAccess($step, $completedSteps)
+                {
+                    if ($step === 1) {
+                        return true;
+                    }
+                    return in_array($step - 1, $completedSteps);
+                }
+            @endphp
+
             <div class="mb-4 d-flex gap-2 flex-wrap">
-                <button class="btn {{ in_array(1, $completedSteps) ? 'btn-success' : 'btn-light' }} step-btn"
-                    data-step="1">
-                    <i class="fa fa-folder me-1"></i> Project Details
-                </button>
-                <button class="btn {{ in_array(2, $completedSteps) ? 'btn-success' : 'btn-light' }} step-btn"
-                    data-step="2">
-                    <i class="fa fa-user-tie me-1"></i> Client Details
-                </button>
-                <button class="btn {{ in_array(3, $completedSteps) ? 'btn-success' : 'btn-light' }} step-btn"
-                    data-step="3">
-                    <i class="fa fa-users me-1"></i> Assign Project Personnel
-                </button>
-                <button class="btn {{ in_array(4, $completedSteps) ? 'btn-success' : 'btn-light' }} step-btn"
-                    data-step="4">
-                    <i class="fa fa-file-contract me-1"></i> Contract Details
-                </button>
-                <button class="btn {{ in_array(5, $completedSteps) ? 'btn-success' : 'btn-light' }} step-btn"
-                    data-step="5">
-                    <i class="fa fa-file-contract me-1"></i> Contract Value
-                </button>
-                <button class="btn {{ in_array(6, $completedSteps) ? 'btn-success' : 'btn-light' }} step-btn"
-                    data-step="5">
-                    <i class="fa fa-file-contract me-1"></i> Bank Guarantee
-                </button>
-                <button class="btn {{ in_array(7, $completedSteps) ? 'btn-success' : 'btn-light' }} step-btn"
-                    data-step="5">
-                    <i class="fa fa-file-contract me-1"></i> Cash Retentions
-                </button>
-                <button class="btn {{ in_array(8, $completedSteps) ? 'btn-success' : 'btn-light' }} step-btn"
-                    data-step="5">
-                    <i class="fa fa-file-contract me-1"></i> Pricing Schedule
-                </button>
-                <button class="btn {{ in_array(9, $completedSteps) ? 'btn-success' : 'btn-light' }} step-btn"
-                    data-step="5">
-                    <i class="fa fa-file-contract me-1"></i> Setup Codes
-                </button>
-                <button class="btn {{ in_array(10, $completedSteps) ? 'btn-success' : 'btn-light' }} step-btn"
-                    data-step="5">
-                    <i class="fa fa-file-contract me-1"></i> Assign codes
-                </button>
-                <button class="btn {{ in_array(11, $completedSteps) ? 'btn-success' : 'btn-light' }} step-btn"
-                    data-step="5">
-                    <i class="fa fa-file-contract me-1"></i> Materials
-                </button>
-                <button class="btn {{ in_array(12, $completedSteps) ? 'btn-success' : 'btn-light' }} step-btn"
-                    data-step="5">
-                    <i class="fa fa-file-contract me-1"></i> Plant
-                </button>
-                <button class="btn {{ in_array(13, $completedSteps) ? 'btn-success' : 'btn-light' }} step-btn"
-                    data-step="5">
-                    <i class="fa fa-file-contract me-1"></i> Labour
-                </button>
+
+                @for ($i = 1; $i <= 13; $i++)
+                    <button class="btn {{ in_array($i, $completedSteps) ? 'btn-success' : 'btn-light' }} step-btn"
+                        data-step="{{ $i }}" {{ canAccess($i, $completedSteps) ? '' : 'disabled' }}>
+                        <i class="fa fa-file-contract me-1"></i>
+                        @switch($i)
+                            @case(1)
+                                Project Details
+                            @break
+
+                            @case(2)
+                                Client Details
+                            @break
+
+                            @case(3)
+                                Assign Project Personnel
+                            @break
+
+                            @case(4)
+                                Contract Details
+                            @break
+
+                            @case(5)
+                                Contract Value
+                            @break
+
+                            @case(6)
+                                Bank Guarantee
+                            @break
+
+                            @case(7)
+                                Cash Retentions
+                            @break
+
+                            @case(8)
+                                Pricing Schedule
+                            @break
+
+                            @case(9)
+                                Setup Codes
+                            @break
+
+                            @case(10)
+                                Assign Codes
+                            @break
+
+                            @case(11)
+                                Materials
+                            @break
+
+                            @case(12)
+                                Plant
+                            @break
+
+                            @case(13)
+                                Labour
+                            @break
+                        @endswitch
+                    </button>
+                @endfor
+
             </div>
             <div id="step1" class="step-panel">
                 <h6 class="fw-semibold mb-3 text-muted border-bottom pb-2">
@@ -162,8 +181,7 @@
 
                     <div class="col-md-6">
                         <label class="form-label fw-semibold">Client Rep Email <span class="text-danger">*</span></label>
-                        <input type="email" id="client_rep_email" class="form-control"
-                            placeholder="email@example.com">
+                        <input type="email" id="client_rep_email" class="form-control" placeholder="email@example.com">
                     </div>
 
                     <div class="col-md-6">
@@ -503,78 +521,75 @@
 
                 <div class="row g-3">
 
-                    <!-- YES / NO -->
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                         <label class="form-label fw-semibold d-block mb-2">
                             Bank Guarantee Required? <span class="text-danger">*</span>
                         </label>
 
                         <div class="d-flex gap-4">
-
                             <div class="custom-radio-option">
                                 <input type="radio" name="bank_guarantee_required" value="1" id="bg_yes">
-                                <label for="bg_yes" class="option-label text-success">
-                                    <span class="check-circle"><i class="fa fa-check"></i></span>
-                                    Yes
-                                </label>
+                                <label for="bg_yes" class="option-label text-success">Yes</label>
                             </div>
 
                             <div class="custom-radio-option">
                                 <input type="radio" name="bank_guarantee_required" value="0" id="bg_no">
-                                <label for="bg_no" class="option-label">
-                                    <span class="check-circle"><i class="fa fa-check"></i></span>
-                                    No
-                                </label>
+                                <label for="bg_no" class="option-label">No</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="bank_fields" class="col-12 d-none">
+                        <div class="row g-3 col">
+                            <div class="row my-2">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Practical Completion (%)</label>
+                                    <select id="practical_completion" class="form-select">
+                                        <option value="">Select</option>
+                                        <option value="0">0%</option>
+                                        <option value="2.5">2.5%</option>
+                                        <option value="5">5%</option>
+                                        <option value="custom">Custom</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-4 d-none" id="custom_practical_wrap">
+                                    <label class="form-label fw-semibold">Custom (%)</label>
+                                    <input type="number" id="custom_practical_completion" max="100"
+                                        class="form-control">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Amount</label>
+                                    <input type="text" id="practical_completion_amount" class="form-control" readonly>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <!-- FINAL -->
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Final Completion (%)</label>
+                                    <select id="final_completion" class="form-select">
+                                        <option value="">Select</option>
+                                        <option value="0">0%</option>
+                                        <option value="2.5">2.5%</option>
+                                        <option value="5">5%</option>
+                                        <option value="custom">Custom</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-4 d-none" id="custom_final_wrap">
+                                    <label class="form-label fw-semibold">Custom (%)</label>
+                                    <input type="number" id="custom_final_completion" max="100"
+                                        class="form-control">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Amount</label>
+                                    <input type="text" id="final_completion_amount" class="form-control" readonly>
+                                </div>
                             </div>
 
                         </div>
-                    </div>
-
-                    <!-- CONDITIONAL FIELDS -->
-                    <div id="bank_fields" class="row g-3 d-none">
-
-                        <!-- Practical -->
-                        <div class="col-md-4">
-                            <label class="form-label fw-semibold">Practical Completion</label>
-                            <select id="practical_completion" class="form-select">
-                                <option value="">Select</option>
-                                <option value="0">0%</option>
-                                <option value="2.5">2.5%</option>
-                                <option value="5">5%</option>
-                                <option value="custom">Custom</option>
-                            </select>
-                        </div>
-
-                        <div class="col-md-4 d-none" id="custom_practical_wrap">
-                            <input type="number" id="custom_practical_completion" class="form-control"
-                                placeholder="Custom %">
-                        </div>
-
-                        <div class="col-md-4">
-                            <input type="text" id="practical_completion_amount" class="form-control" readonly>
-                        </div>
-
-                        <!-- Final -->
-                        <div class="col-md-4">
-                            <label class="form-label fw-semibold">Final Completion</label>
-                            <select id="final_completion" class="form-select">
-                                <option value="">Select</option>
-                                <option value="0">0%</option>
-                                <option value="2.5">2.5%</option>
-                                <option value="5">5%</option>
-                                <option value="custom">Custom</option>
-                            </select>
-                        </div>
-
-                        <div class="col-md-4 d-none" id="custom_final_wrap">
-                            <input type="number" id="custom_final_completion" class="form-control"
-                                placeholder="Custom %">
-                        </div>
-
-                        <div class="col-md-4">
-                            <input type="text" id="final_completion_amount" class="form-control" readonly>
-                        </div>
-
                     </div>
 
                 </div>
@@ -588,10 +603,84 @@
                     </button>
                 </div>
             </div>
+
             <div id="step7" class="step-panel d-none">
                 <h6 class="fw-semibold mb-3 text-muted border-bottom pb-2">
                     <i class="fa fa-file-contract me-1"></i> Cash Retentions
                 </h6>
+
+                <div class="row g-3">
+
+                    <!-- YES / NO -->
+                    <div class="col-md-12">
+                        <label class="form-label fw-semibold d-block mb-2">
+                            Cash Retentions Required? <span class="text-danger">*</span>
+                        </label>
+
+                        <div class="d-flex gap-4">
+                            <label><input type="radio" name="cash_retentions_required" value="1"> Yes</label>
+                            <label><input type="radio" name="cash_retentions_required" value="0"> No</label>
+                        </div>
+                    </div>
+
+                    <!-- CONDITIONAL -->
+                    <div id="cash_fields" class="col-12 d-none">
+                        <div class="row g-3">
+                            <div class="row">
+                                <!-- PRACTICAL -->
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Practical (%)</label>
+                                    <select id="cash_practical_completion" class="form-select">
+                                        <option value="">Select</option>
+                                        <option value="0">0%</option>
+                                        <option value="2.5">2.5%</option>
+                                        <option value="5">5%</option>
+                                        <option value="custom">Custom</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-4 d-none" id="custom_cash_practical_wrap">
+                                    <label class="form-label fw-semibold">Custom (%)</label>
+                                    <input type="number" id="custom_cash_practical_completion" class="form-control"
+                                        placeholder="Custom %">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Amount</label>
+                                    <input type="text" id="cash_practical_completion_amount" class="form-control"
+                                        readonly>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <!-- FINAL -->
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Final (%)</label>
+                                    <select id="cash_final_completion" class="form-select">
+                                        <option value="">Select</option>
+                                        <option value="0">0%</option>
+                                        <option value="2.5">2.5%</option>
+                                        <option value="5">5%</option>
+                                        <option value="custom">Custom</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-4 d-none" id="custom_cash_final_wrap">
+                                    <label class="form-label fw-semibold">Custom (%)</label>
+                                    <input type="number" id="custom_cash_final_completion" class="form-control"
+                                        placeholder="Custom %">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Amount</label>
+                                    <input type="text" id="cash_final_completion_amount" class="form-control"
+                                        readonly>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
 
                 <div class="mt-4 d-flex gap-2">
                     <button type="button" class="btn btn-secondary" id="step7_prev">
@@ -602,11 +691,20 @@
                     </button>
                 </div>
             </div>
+
             <div id="step8" class="step-panel d-none">
                 <h6 class="fw-semibold mb-3 text-muted border-bottom pb-2">
                     <i class="fa fa-file-contract me-1"></i> Pricing Schedule
                 </h6>
+                <div class="row g-3">
 
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Upload Pricing Schedule</label>
+                        <x-dropzone name="pricing_schedule" type="document" :required="true"
+                            placeholder="Upload Excel File" />
+                    </div>
+
+                </div>
 
                 <div class="mt-4 d-flex gap-2">
                     <button type="button" class="btn btn-secondary" id="step8_prev">
@@ -617,10 +715,25 @@
                     </button>
                 </div>
             </div>
+
             <div id="step9" class="step-panel d-none">
                 <h6 class="fw-semibold mb-3 text-muted border-bottom pb-2">
                     <i class="fa fa-file-contract me-1"></i> Setup Codes
                 </h6>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped" id="step9">
+                        <thead class="bg-success text-white">
+                            <tr>
+                                <th>Code</th>
+                                <th>Description</th>
+                                <th>Assign Margin (%)</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
 
 
                 <div class="mt-4 d-flex gap-2">
@@ -637,6 +750,22 @@
                     <i class="fa fa-file-contract me-1"></i> Assign codes
                 </h6>
 
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped" id="pricing_table">
+                        <thead class="bg-success text-white">
+                            <tr>
+                                <th>Item</th>
+                                <th>Description</th>
+                                <th>Qty</th>
+                                <th>Unit</th>
+                                <th>Rate</th>
+                                <th>Amount</th>
+                                <th>Code</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
 
                 <div class="mt-4 d-flex gap-2">
                     <button type="button" class="btn btn-secondary" id="step10_prev">
@@ -652,7 +781,23 @@
                     <i class="fa fa-file-contract me-1"></i> Materials
                 </h6>
 
-
+                <div class="table-responsive">
+                    <table id="materialsTable" class="table table-striped table-bordered display nowrap w-100">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Category</th>
+                                <th>Item</th>
+                                <th>Supplier</th>
+                                <th>Unit</th>
+                                <th>Rate</th>
+                                <th>Docket</th>
+                                <th>Assign to Project</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
                 <div class="mt-4 d-flex gap-2">
                     <button type="button" class="btn btn-secondary" id="step11_prev">
                         <i class="fa fa-arrow-left me-1"></i> Previous
@@ -667,6 +812,24 @@
                     <i class="fa fa-file-contract me-1"></i> Plant
                 </h6>
 
+                <div class="table-responsive">
+                    <table id="plantTableProject" class="table table-striped table-bordered w-100">
+                        <thead>
+                            <tr>
+                                <th>Asset ID</th>
+                                <th>Plant Type</th>
+                                <th>Capacity</th>
+                                <th>Supplier</th>
+                                <th>Plant Description</th>
+                                <th>Unit</th>
+                                <th>Rate</th>
+                                <th>Dockets</th>
+                                <th>Assign to Project</th>
+                                <th class="text-center" style="width:130px;">Action</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
 
                 <div class="mt-4 d-flex gap-2">
                     <button type="button" class="btn btn-secondary" id="step12_prev">
@@ -682,6 +845,22 @@
                     <i class="fa fa-file-contract me-1"></i> Labour
                 </h6>
 
+                <div class="table-responsive">
+                    <table id="labourTableProject" class="table table-striped table-bordered display nowrap w-100">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Employment Type</th>
+                                <th>Position</th>
+                                <th>Employer</th>
+                                <th>Region</th>
+                                <th>Rate</th>
+                                <th>Assign to Project</th>
+                                <th class="text-center" style="width:130px;">Action</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
 
                 <div class="mt-4 d-flex gap-2">
                     <button type="button" class="btn btn-secondary" id="step13_prev">
@@ -700,6 +879,7 @@
     <script>
         const existingProject = @json($existingProject ?? null);
         const completedStepsData = @json($completedSteps ?? []);
+        const toggleResourceUrl = "{{ route('projects.toggleResource') }}";
         const projectsDataUrl = "{{ route('projects.data') }}";
         const projectStepUrl = "{{ route('projects.step') }}";
         const projectShowUrl = "{{ url('projects') }}";
@@ -707,6 +887,15 @@
         const projectDeleteUrl = "{{ url('projects') }}";
         const projectNumberUrl = "{{ route('project.generateNumber') }}";
         const getClientUrl = "{{ route('clients.getClient', ':id') }}";
+        const labourDataUrl = "{{ route('admin.project.labour.data') }}";
+        const labourBaseUrl = "{{ url('project/labour') }}";
+
+        const matDataUrl = "{{ route('materials.data') }}";
+        const matBaseUrl = "{{ url('materials') }}";
+
+        const plantDataUrl = "{{ route('plant.data') }}";
+        const plantBaseUrl = "{{ url('plant') }}";
+        const assignCodes = @json($assignCodes);
     </script>
     <script src="{{ asset('js/modules/projects.js') }}"></script>
 @endpush

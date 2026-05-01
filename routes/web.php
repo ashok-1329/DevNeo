@@ -20,8 +20,7 @@ use App\Http\Controllers\Admin\Configuration\ProjectCodeCategoryController;
 use App\Http\Controllers\Admin\Configuration\PlantTypeController;
 use App\Http\Controllers\Admin\Configuration\PlantCapacityController;
 use App\Http\Controllers\Admin\Configuration\ProjectRegionController;
-
-
+use App\Http\Controllers\Admin\PlantController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -136,6 +135,7 @@ Route::middleware(['auth'])->group(function () {
     // here all project routes
 
     Route::get('projects/data', [ProjectController::class, 'getData'])->name('projects.data');
+    Route::post('projects/toggleResource', [ProjectController::class, 'toggleResource'])->name('projects.toggleResource');
     Route::post('projects/step',         [ProjectController::class, 'handleStep'])->name('projects.step');
     Route::post('projects/{id}/update-status', [ProjectController::class, 'updateStatus'])->name('projects.updateStatus');
     Route::get('/project/generate-number', [ProjectController::class, 'generateProjectNumber'])->name('project.generateNumber');
@@ -176,6 +176,14 @@ Route::middleware(['auth'])->group(function () {
     Route::post('materials/{id}/status', [MaterialController::class, 'statusUpdate'])
         ->name('materials.statusUpdate');
     Route::resource('materials', MaterialController::class);
+
+    Route::get('plant/data', [PlantController::class, 'getData'])
+        ->name('plant.data');
+    Route::get('plant/products-by-category/{categoryId}', [PlantController::class, 'productsByCategory'])
+        ->name('plant.productsByCategory');
+    Route::post('plant/{id}/status', [PlantController::class, 'statusUpdate'])
+        ->name('plant.statusUpdate');
+    Route::resource('plant', PlantController::class);
 
 
     Route::prefix('dockets')->group(function () {

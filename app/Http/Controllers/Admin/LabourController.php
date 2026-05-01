@@ -13,9 +13,6 @@ use Illuminate\Http\Request;
 
 class LabourController extends Controller
 {
-    // ──────────────────────────────────────────────────────────────────────────
-    // HELPERS
-    // ──────────────────────────────────────────────────────────────────────────
 
     private function dropdowns(): array
     {
@@ -61,18 +58,12 @@ class LabourController extends Controller
         ];
     }
 
-    // ──────────────────────────────────────────────────────────────────────────
-    // INDEX
-    // ──────────────────────────────────────────────────────────────────────────
 
     public function index()
     {
         return view('admin.project.labour.index');
     }
 
-    // ──────────────────────────────────────────────────────────────────────────
-    // DATA  (DataTables JSON)
-    // ──────────────────────────────────────────────────────────────────────────
 
     public function getData()
     {
@@ -104,9 +95,6 @@ class LabourController extends Controller
         return response()->json($labours);
     }
 
-    // ──────────────────────────────────────────────────────────────────────────
-    // AUTOCOMPLETE
-    // ──────────────────────────────────────────────────────────────────────────
 
     public function autocomplete(Request $request)
     {
@@ -122,9 +110,6 @@ class LabourController extends Controller
         ]));
     }
 
-    // ──────────────────────────────────────────────────────────────────────────
-    // RATE LOOKUP  (placeholder – rate table not built yet)
-    // ──────────────────────────────────────────────────────────────────────────
 
     public function getRate(Request $request)
     {
@@ -132,18 +117,13 @@ class LabourController extends Controller
         return response()->json(['rate' => null]);
     }
 
-    // ──────────────────────────────────────────────────────────────────────────
-    // CREATE
-    // ──────────────────────────────────────────────────────────────────────────
 
     public function create()
     {
         return view('admin.project.labour.create', $this->dropdowns());
     }
 
-    // ──────────────────────────────────────────────────────────────────────────
-    // STORE
-    // ──────────────────────────────────────────────────────────────────────────
+
 
     public function store(Request $request)
     {
@@ -177,10 +157,6 @@ class LabourController extends Controller
             ->with('success', 'Labour added successfully.');
     }
 
-    // ──────────────────────────────────────────────────────────────────────────
-    // SHOW
-    // ──────────────────────────────────────────────────────────────────────────
-
     public function show($id)
     {
         $labour = ProjectLabour::with(['region', 'positionRelation', 'employmentType'])
@@ -193,9 +169,6 @@ class LabourController extends Controller
         return view('admin.project.labour.show', compact('labour', 'employer'));
     }
 
-    // ──────────────────────────────────────────────────────────────────────────
-    // EDIT
-    // ──────────────────────────────────────────────────────────────────────────
 
     public function edit($id)
     {
@@ -206,10 +179,6 @@ class LabourController extends Controller
             compact('labour')
         ));
     }
-
-    // ──────────────────────────────────────────────────────────────────────────
-    // UPDATE
-    // ──────────────────────────────────────────────────────────────────────────
 
     public function update(Request $request, $id)
     {
@@ -241,10 +210,6 @@ class LabourController extends Controller
             ->route('admin.project.labour.index')
             ->with('success', 'Labour updated successfully.');
     }
-
-    // ──────────────────────────────────────────────────────────────────────────
-    // DESTROY
-    // ──────────────────────────────────────────────────────────────────────────
 
     public function destroy($id)
     {

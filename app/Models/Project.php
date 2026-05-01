@@ -32,6 +32,7 @@ class Project extends Model
         'contractor_type',
         'superintendent',
         'contract_type',
+        'pricing_schedule_file',
         'contract_type_other',
         'contract_number',
         'commencement_date',
@@ -90,5 +91,15 @@ class Project extends Model
     public function paymentRules()
     {
         return $this->hasMany(PaymentRule::class, 'project_number', 'project_number');
+    }
+
+    public function pricing_schedules()
+    {
+        return $this->hasMany(ProjectPricingSchedule::class);
+    }
+
+    public function assign_codes()
+    {
+        return $this->hasMany(ProjectAssignCode::class);
     }
 }
